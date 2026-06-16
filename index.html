@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NCLEX Pro Solutions — Client Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet"/>
+<style>
+/* ─────────────────────────────────────
+   TOKENS
+───────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Brand */
+  --navy:  #07192f;
+  --navy2: #0c2444;
+  --teal:  #00a896;
+  --teal2: #00c9b5;
+  --gold:  #c8960c;
+  --gold2: #f0b429;
+
+  /* Clinical whites */
+  --white: #ffffff;
+  --off:   #f8f9fb;
+  --pale:  #eef1f6;
+  --pale2: #e3e8f0;
+
+  /* Text */
+  --ink:   #0d1b2a;
+  --mid:   #3d5166;
+  --muted: #6b7f96;
+  --faint: #a8b8cc;
+
+  /* State */
+  --success: #059669; --success-bg: #ecfdf5;
+  --warn:    #d97706; --warn-bg:    #fffbeb;
+  --danger:  #dc2626; --danger-bg:  #fef2f2;
+  --info:    #0284c7; --info-bg:    #f0f9ff;
+
+  /* Geometry */
+  --r:  8px;
+  --r2: 14px;
+  --r3: 20px;
+  --sh: 0 1px 4px rgba(7,25,47,.06), 0 4px 16px rgba(7,25,47,.07);
+  --sh2:0 8px 32px rgba(7,25,47,.12);
+}
+
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;overflow-x:hidden;font-size:14px;line-height:1.5}
+
+/* ─────────────────────────────────────
+   SCREENS
+───────────────────────────────────── */
+.screen{display:none}
+.screen.on{display:flex;flex-direction:column;min-height:100vh}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.fadein{animation:fadeUp .3s ease forwards}
+
+/* ─────────────────────────────────────
+   AUTH
+───────────────────────────────────── */
+#s-auth{background:var(--white);align-items:stretch;flex-direction:row;min-height:100vh;height:100vh;overflow:hidden}
+
+.auth-left{
+  flex:0 0 400px;background:var(--navy);
+  display:flex;flex-direction:column;justify-content:center;gap:2.5rem;
+  padding:3rem 2.5rem;position:relative;overflow:hidden;
+}
+.auth-left::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 30% 35%,rgba(0,168,150,.16) 0%,transparent 70%),
+             radial-gradient(ellipse 40% 40% at 80% 75%,rgba(200,150,12,.09) 0%,transparent 60%);
+}
+.auth-brand{position:relative;z-index:1}
+.auth-logo{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:#fff;letter-spacing:-.02em}
+.auth-logo span{color:var(--teal2)}
+.auth-tagline{color:rgba(255,255,255,.4);font-size:.75rem;margin-top:.25rem;letter-spacing:.04em;text-transform:uppercase}
+
+.auth-stat-block{position:relative;z-index:1}
+.auth-stat{margin-bottom:1.75rem}
+.auth-stat-n{font-family:'Fraunces',serif;font-size:3rem;font-weight:700;color:var(--gold2);line-height:1}
+.auth-stat-l{color:rgba(255,255,255,.4);font-size:.75rem;margin-top:.2rem}
+
+.auth-quote{position:relative;z-index:1;border-left:2px solid var(--teal);padding-left:1rem}
+.auth-quote p{color:rgba(255,255,255,.6);font-size:.85rem;line-height:1.7;font-style:italic}
+.auth-quote cite{display:block;color:var(--teal2);font-size:.72rem;font-weight:600;margin-top:.5rem;font-style:normal}
+
+.auth-right{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--white);overflow-y:auto}
+.auth-box{width:100%;max-width:400px;padding:1rem 0}
+.auth-box-title{font-family:'Fraunces',serif;font-size:1.75rem;font-weight:700;color:var(--ink);margin-bottom:.25rem}
+.auth-box-sub{color:var(--muted);font-size:.85rem;margin-bottom:2rem}
+.auth-tabs{display:flex;background:var(--pale);border-radius:50px;padding:.3rem;gap:.25rem;margin-bottom:1.75rem}
+.auth-tab{flex:1;text-align:center;padding:.5rem;border-radius:50px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .2s}
+.auth-tab.on{background:var(--navy);color:#fff}
+
+/* Form elements */
+.fg{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.9rem}
+.fg label{font-size:.75rem;font-weight:600;color:var(--mid);letter-spacing:.02em}
+.fg label .req{color:var(--teal)}
+.fg input,.fg select{
+  width:100%;padding:.7rem .95rem;
+  border:1.5px solid var(--pale2);border-radius:var(--r);
+  font-size:.875rem;font-family:'Inter',sans-serif;color:var(--ink);
+  background:var(--white);outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.fg input:focus,.fg select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,168,150,.1)}
+.fg input::placeholder{color:var(--faint)}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;padding:.72rem 1.4rem;border-radius:50px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .22s;text-decoration:none;white-space:nowrap}
+.btn-primary{background:var(--teal);color:#fff;box-shadow:0 3px 12px rgba(0,168,150,.25)}
+.btn-primary:hover{background:var(--teal2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,168,150,.35)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy2)}
+.btn-ghost{background:transparent;color:var(--mid);border:1.5px solid var(--pale2)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:.45rem .9rem;font-size:.75rem}
+.btn-lg{padding:.85rem 1.8rem;font-size:.875rem}
+.btn-block{width:100%;border-radius:var(--r)}
+.err{color:var(--danger);font-size:.75rem;margin-top:.25rem}
+
+/* ─────────────────────────────────────
+   PORTAL SHELL
+───────────────────────────────────── */
+#s-portal{flex-direction:row;min-height:100vh;background:var(--off)}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;background:var(--navy);flex-shrink:0;
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:100;
+  transition:transform .3s;
+}
+.sb-header{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-logo{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:#fff}
+.sb-logo span{color:var(--teal2)}
+.sb-user{display:flex;align-items:center;gap:.7rem;margin-top:1rem}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--navy2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;flex-shrink:0}
+.sb-name{color:#fff;font-size:.82rem;font-weight:600}
+.sb-ref{color:rgba(255,255,255,.35);font-size:.68rem}
+
+.sb-nav{flex:1;padding:1rem .75rem;overflow-y:auto}
+.sb-section{font-size:.62rem;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:.1em;text-transform:uppercase;padding:.6rem .5rem .3rem;margin-top:.5rem}
+.sb-item{
+  display:flex;align-items:center;gap:.7rem;padding:.6rem .75rem;
+  border-radius:var(--r);cursor:pointer;margin-bottom:.15rem;
+  color:rgba(255,255,255,.5);font-size:.82rem;font-weight:500;
+  transition:all .2s;text-decoration:none;
+}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-item.on{background:rgba(0,168,150,.15);color:var(--teal2);border-left:2px solid var(--teal2)}
+.sb-item .si{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.sb-item.on .si{opacity:1}
+.sb-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:.6rem;font-weight:700;padding:.1rem .45rem;border-radius:50px;min-width:18px;text-align:center}
+.sb-badge.gold{background:var(--gold)}
+
+.sb-footer{padding:.75rem 1rem;border-top:1px solid rgba(255,255,255,.06)}
+.sb-logout{display:flex;align-items:center;gap:.6rem;color:rgba(255,255,255,.35);font-size:.78rem;cursor:pointer;padding:.4rem .5rem;border-radius:var(--r);transition:all .2s}
+.sb-logout:hover{color:#fff;background:rgba(255,255,255,.06)}
+
+/* MAIN CONTENT */
+.portal-main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.portal-topbar{
+  background:var(--white);border-bottom:1px solid var(--pale2);
+  padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:90;
+}
+.topbar-title{font-size:.95rem;font-weight:600;color:var(--ink)}
+.topbar-sub{font-size:.75rem;color:var(--muted);margin-top:.05rem}
+.topbar-actions{display:flex;align-items:center;gap:.75rem}
+.topbar-wa{display:inline-flex;align-items:center;gap:.4rem;background:#25d366;color:#fff;padding:.45rem 1rem;border-radius:50px;font-size:.75rem;font-weight:600;text-decoration:none;transition:all .2s}
+.topbar-wa:hover{background:#1ebe5d}
+
+.portal-body{flex:1;padding:1.75rem 2rem}
+.portal-section{display:none}
+.portal-section.on{display:block;animation:fadeUp .3s ease}
+
+/* ─────────────────────────────────────
+   CARDS & LAYOUT
+───────────────────────────────────── */
+.card{background:var(--white);border:1px solid var(--pale2);border-radius:var(--r2);box-shadow:var(--sh)}
+.card-pad{padding:1.5rem}
+.card-title{font-size:.82rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1.1rem}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid var(--pale2)}
+.card-header-title{font-weight:600;color:var(--ink);font-size:.9rem}
+.card-body{padding:1.25rem 1.4rem}
+
+/* Grid helpers */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1.1rem}
+.g-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.1rem}
+
+/* ─────────────────────────────────────
+   BADGES & CHIPS
+───────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .65rem;border-radius:50px;font-size:.7rem;font-weight:600;letter-spacing:.02em}
+.b-success{background:var(--success-bg);color:var(--success);border:1px solid rgba(5,150,105,.2)}
+.b-warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(217,119,6,.2)}
+.b-danger{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(220,38,38,.2)}
+.b-teal{background:rgba(0,168,150,.08);color:var(--teal);border:1px solid rgba(0,168,150,.2)}
+.b-navy{background:rgba(7,25,47,.06);color:var(--mid);border:1px solid var(--pale2)}
+.b-gold{background:rgba(200,150,12,.1);color:var(--gold);border:1px solid rgba(200,150,12,.2)}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-success{background:var(--success)}
+.dot-warn{background:var(--warn)}
+.dot-teal{background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,168,150,.4)}50%{box-shadow:0 0 0 5px rgba(0,168,150,.0)}}
+
+/* ─────────────────────────────────────
+   STAT CARDS
+───────────────────────────────────── */
+.stat-card{background:var(--white);border:1px solid var(--pale2);border-radius:var(--r2);padding:1.2rem 1.4rem;box-shadow:var(--sh);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--teal)}
+.stat-card.gold::after{background:var(--gold)}
+.stat-card.navy::after{background:var(--navy)}
+.stat-card.success::after{background:var(--success)}
+.stat-icon{width:36px;height:36px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:.95rem;margin-bottom:.75rem}
+.stat-icon.teal{background:rgba(0,168,150,.1)}
+.stat-icon.gold{background:rgba(200,150,12,.1)}
+.stat-icon.navy{background:rgba(7,25,47,.07)}
+.stat-icon.success{background:var(--success-bg)}
+.stat-val{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--ink);line-height:1}
+.stat-label{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+.stat-sub{font-size:.68rem;font-weight:600;margin-top:.4rem}
+.stat-sub.up{color:var(--success)}
+.stat-sub.warn{color:var(--warn)}
+
+/* ─────────────────────────────────────
+   DASHBOARD
+───────────────────────────────────── */
+.welcome-bar{
+  background:var(--navy);border-radius:var(--r2);padding:1.75rem 2rem;
+  margin-bottom:1.5rem;position:relative;overflow:hidden;
+}
+.welcome-bar::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 85% 50%,rgba(0,168,150,.12) 0%,transparent 70%)}
+.welcome-h{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:.3rem}
+.welcome-h em{font-style:normal;color:var(--teal2)}
+.welcome-sub{color:rgba(255,255,255,.5);font-size:.82rem}
+.welcome-ref{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:.35rem .9rem;font-size:.72rem;color:rgba(255,255,255,.6);margin-top:.9rem}
+.welcome-ref strong{color:var(--teal2)}
+
+/* ─────────────────────────────────────
+   PIPELINE TRACKER
+───────────────────────────────────── */
+.pipeline-track{display:flex;align-items:center;margin:1rem 0 .5rem;position:relative}
+.pipeline-track::before{content:'';position:absolute;top:20px;left:24px;right:24px;height:2px;background:var(--pale2);z-index:0}
+.pipeline-track::after{content:'';position:absolute;top:20px;left:24px;height:2px;background:linear-gradient(90deg,var(--teal),var(--teal2));z-index:1;transition:width 1.2s ease;width:var(--prog,0%)}
+.pip-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;z-index:2;cursor:pointer}
+.pip-dot{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--white);border:2px solid var(--pale2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;transition:all .3s;margin-bottom:.5rem;
+}
+.pip-step.done .pip-dot{background:var(--teal);border-color:var(--teal);color:#fff;font-size:.75rem;font-weight:700}
+.pip-step.done .pip-dot::after{content:'✓'}
+.pip-step.done .pip-emoji{display:none}
+.pip-step.active .pip-dot{border-color:var(--teal);border-width:2px;box-shadow:0 0 0 5px rgba(0,168,150,.12)}
+.pip-step.active .pip-dot .pip-emoji{color:var(--teal)}
+.pip-step.pending .pip-dot{opacity:.45}
+.pip-label{font-size:.67rem;font-weight:600;color:var(--muted);text-align:center;max-width:70px;line-height:1.3}
+.pip-step.done .pip-label,.pip-step.active .pip-label{color:var(--ink)}
+.pip-status-txt{font-size:.62rem;color:var(--faint);text-align:center;margin-top:.1rem}
+.pip-step.done .pip-status-txt{color:var(--teal)}
+.pip-step.active .pip-status-txt{color:var(--warn)}
+
+.detail-panel{background:var(--pale);border-radius:var(--r);padding:1rem 1.2rem;margin-top:1rem;border-left:3px solid var(--teal)}
+.dp-title{font-weight:600;color:var(--ink);font-size:.875rem;margin-bottom:.3rem}
+.dp-desc{color:var(--muted);font-size:.8rem;line-height:1.65}
+.dp-meta{margin-top:.5rem;font-size:.72rem;color:var(--faint)}
+
+/* ─────────────────────────────────────
+   TIMELINE
+───────────────────────────────────── */
+.tl{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:.85rem;padding:.65rem 0;border-bottom:1px solid var(--pale2)}
+.tl-item:last-child{border:none}
+.tl-line{display:flex;flex-direction:column;align-items:center;gap:0}
+.tl-dot2{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px}
+.tl-dot2.grey{background:var(--pale2)}
+.tl-dot2.warn{background:var(--warn)}
+.tl-content{flex:1}
+.tl-title{font-size:.83rem;font-weight:600;color:var(--ink)}
+.tl-date{font-size:.72rem;color:var(--muted);margin-top:.1rem}
+.tl-note{font-size:.75rem;color:var(--muted);margin-top:.2rem;font-style:italic}
+
+/* ─────────────────────────────────────
+   DATA ROWS
+───────────────────────────────────── */
+.data-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--pale2)}
+.data-row:last-child{border:none}
+.data-key{font-size:.8rem;color:var(--muted)}
+.data-val{font-size:.82rem;font-weight:600;color:var(--ink)}
+
+/* ─────────────────────────────────────
+   REGISTRATION FORM
+───────────────────────────────────── */
+.reg-steps{display:flex;align-items:center;gap:.4rem;margin-bottom:2rem}
+.rs-step{display:flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:600;color:var(--faint)}
+.rs-step.on{color:var(--teal)}
+.rs-step.done{color:var(--success)}
+.rs-num{width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.68rem}
+.rs-step.done .rs-num{background:var(--success);border-color:var(--success);color:#fff}
+.rs-step.on .rs-num{background:var(--teal);border-color:var(--teal);color:#fff}
+.rs-sep{flex:1;height:1px;background:var(--pale2)}
+.reg-section{display:none}
+.reg-section.on{display:block}
+.sec-label{font-size:.72rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--pale2)}
+
+.file-drop{border:2px dashed var(--pale2);border-radius:var(--r);padding:1.2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--off)}
+.file-drop:hover{border-color:var(--teal);background:rgba(0,168,150,.04)}
+.file-drop-icon{font-size:1.5rem;margin-bottom:.3rem}
+.file-drop strong{font-size:.82rem;color:var(--ink)}
+.file-drop p{font-size:.72rem;color:var(--muted);margin-top:.15rem}
+
+/* ─────────────────────────────────────
+   BOOKING
+───────────────────────────────────── */
+.session-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.25rem}
+.sess-card{border:1.5px solid var(--pale2);border-radius:var(--r2);padding:1.1rem;cursor:pointer;transition:all .2s;background:var(--white)}
+.sess-card:hover{border-color:var(--teal)}
+.sess-card.sel{border-color:var(--teal);background:rgba(0,168,150,.04)}
+.sess-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--pale2);float:right;display:flex;align-items:center;justify-content:center;font-size:.6rem;transition:all .2s}
+.sess-card.sel .sess-check{background:var(--teal);border-color:var(--teal);color:#fff}
+.sess-name{font-weight:600;font-size:.875rem;color:var(--ink);margin-bottom:.15rem}
+.sess-price{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--teal)}
+.sess-price small{font-family:'Inter',sans-serif;font-size:.72rem;color:var(--muted);font-weight:400}
+.sess-desc{font-size:.75rem;color:var(--muted);margin-top:.3rem}
+
+.cal-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.cal-month{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.cal-month-title{font-weight:600;font-size:.875rem;color:var(--ink)}
+.cal-nav-btn{background:none;border:1.5px solid var(--pale2);border-radius:var(--r3);padding:.3rem .6rem;cursor:pointer;color:var(--mid);transition:all .2s;font-size:.75rem}
+.cal-nav-btn:hover{border-color:var(--teal);color:var(--teal)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.3rem}
+.cal-hd{text-align:center;font-size:.65rem;font-weight:700;color:var(--faint);text-transform:uppercase;padding:.2rem}
+.cal-day{text-align:center;padding:.55rem .2rem;border-radius:var(--r);font-size:.78rem;cursor:pointer;transition:all .18s;border:1.5px solid transparent;color:var(--mid);font-weight:500}
+.cal-day:hover:not(.dis):not(.emp){background:rgba(0,168,150,.08);border-color:rgba(0,168,150,.25);color:var(--teal)}
+.cal-day.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
+.cal-day.avail{background:rgba(5,150,105,.05)}
+.cal-day.dis{color:var(--faint);cursor:not-allowed}
+.cal-day.emp{cursor:default}
+.time-slots{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;max-height:220px;overflow-y:auto}
+.ts{padding:.55rem;border-radius:var(--r);border:1.5px solid var(--pale2);font-size:.78rem;font-weight:500;cursor:pointer;text-align:center;transition:all .18s;color:var(--mid);background:var(--white)}
+.ts:hover{border-color:var(--teal);color:var(--teal)}
+.ts.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
+.ts.bkd{background:var(--pale);color:var(--faint);cursor:not-allowed;border-color:transparent}
+
+/* ─────────────────────────────────────
+   PAYMENTS
+───────────────────────────────────── */
+.plan-list{display:flex;flex-direction:column;gap:.7rem}
+.plan-item{border:1.5px solid var(--pale2);border-radius:var(--r2);padding:1.1rem 1.3rem;cursor:pointer;transition:all .2s;background:var(--white);position:relative}
+.plan-item:hover{border-color:var(--teal)}
+.plan-item.sel{border-color:var(--teal);background:rgba(0,168,150,.03)}
+.plan-chk{position:absolute;top:1rem;right:1rem;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--pale2);display:flex;align-items:center;justify-content:center;font-size:.6rem;transition:all .2s}
+.plan-item.sel .plan-chk{background:var(--teal);border-color:var(--teal);color:#fff}
+.plan-badge{display:inline-block;background:var(--gold);color:#fff;font-size:.62rem;font-weight:700;padding:.12rem .5rem;border-radius:50px;margin-left:.5rem;vertical-align:middle}
+.plan-name{font-weight:600;font-size:.9rem;color:var(--ink)}
+.plan-price{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--teal);line-height:1;margin:.2rem 0}
+.plan-price small{font-family:'Inter',sans-serif;font-size:.72rem;color:var(--muted);font-weight:400}
+.plan-desc{font-size:.75rem;color:var(--muted)}
+
+.pay-methods{display:flex;gap:.5rem;margin-bottom:1.25rem}
+.pm{flex:1;padding:.55rem;border-radius:var(--r);border:1.5px solid var(--pale2);text-align:center;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .18s;background:var(--white)}
+.pm.on{border-color:var(--teal);color:var(--teal);background:rgba(0,168,150,.05)}
+.pay-summary{background:var(--navy);border-radius:var(--r2);padding:1.5rem}
+.ps-title{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:1rem}
+.ps-row{display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.ps-row:last-of-type{border:none}
+.ps-key{color:rgba(255,255,255,.45);font-size:.78rem}
+.ps-val{color:#fff;font-size:.8rem;font-weight:600}
+.ps-total{color:var(--gold2)!important;font-size:1rem!important}
+.dark-input{width:100%;padding:.68rem .95rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--r);color:#fff;font-size:.85rem;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;margin-bottom:.75rem}
+.dark-input:focus{border-color:var(--teal)}
+.dark-input::placeholder{color:rgba(255,255,255,.25)}
+.momo-nets{display:flex;gap:.5rem;margin-bottom:.75rem}
+.momo-net{flex:1;padding:.5rem;border-radius:var(--r);border:1.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:.72rem;font-weight:600;cursor:pointer;text-align:center;transition:all .18s;background:transparent}
+.momo-net.on{border-color:var(--gold);color:var(--gold2);background:rgba(200,150,12,.1)}
+.secure-note{text-align:center;color:rgba(255,255,255,.25);font-size:.68rem;margin-top:.65rem}
+
+/* ─────────────────────────────────────
+   DOCUMENTS
+───────────────────────────────────── */
+.doc-item{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid var(--pale2)}
+.doc-item:last-child{border:none}
+.doc-icon{width:36px;height:36px;border-radius:var(--r);background:rgba(0,168,150,.08);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.doc-name{font-size:.83rem;font-weight:600;color:var(--ink)}
+.doc-meta{font-size:.72rem;color:var(--muted);margin-top:.1rem}
+
+/* ─────────────────────────────────────
+   SUCCESS / EMPTY STATES
+───────────────────────────────────── */
+.success-state{text-align:center;padding:3rem 1.5rem}
+.success-icon{font-size:3rem;margin-bottom:.75rem;display:block;animation:pop .5s cubic-bezier(.36,1.56,.64,1)}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.success-title{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:.4rem}
+.success-sub{color:var(--muted);font-size:.875rem;margin-bottom:1.75rem;line-height:1.65}
+.ref-box{display:inline-block;background:rgba(0,168,150,.06);border:1.5px solid rgba(0,168,150,.2);border-radius:var(--r2);padding:.85rem 1.5rem;margin-bottom:1.5rem}
+.ref-label{font-size:.65rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em}
+.ref-code{font-family:'Fraunces',serif;font-size:1.75rem;font-weight:700;color:var(--ink);letter-spacing:.08em}
+
+/* ─────────────────────────────────────
+   ADMIN PORTAL
+───────────────────────────────────── */
+#s-admin{flex-direction:row;min-height:100vh;background:var(--off)}
+.admin-sidebar{width:220px;background:var(--navy2);flex-shrink:0;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100}
+.admin-brand{padding:1.25rem 1.1rem;border-bottom:1px solid rgba(255,255,255,.07)}
+.admin-brand-name{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:#fff}
+.admin-brand-name span{color:var(--gold2)}
+.admin-brand-role{font-size:.65rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.07em;margin-top:.15rem}
+.admin-nav{flex:1;padding:.75rem .6rem}
+.admin-item{display:flex;align-items:center;gap:.65rem;padding:.58rem .7rem;border-radius:var(--r);cursor:pointer;color:rgba(255,255,255,.45);font-size:.8rem;font-weight:500;margin-bottom:.15rem;transition:all .18s}
+.admin-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.admin-item.on{background:rgba(240,180,41,.12);color:var(--gold2);border-left:2px solid var(--gold2)}
+.admin-main{margin-left:220px;flex:1;padding:1.75rem 2rem;background:var(--off)}
+.admin-header{margin-bottom:1.75rem}
+.admin-page-title{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--ink)}
+.admin-page-sub{color:var(--muted);font-size:.82rem;margin-top:.2rem}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r2);border:1px solid var(--pale2)}
+table{width:100%;border-collapse:collapse;background:var(--white)}
+thead th{text-align:left;font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding:.7rem 1rem;border-bottom:1px solid var(--pale2);background:var(--off)}
+tbody td{padding:.8rem 1rem;border-bottom:1px solid var(--pale2);font-size:.82rem;color:var(--ink)}
+tbody tr:last-child td{border:none}
+tbody tr:hover td{background:rgba(0,168,150,.03)}
+.stage-sel{border:1.5px solid var(--pale2);border-radius:50px;padding:.3rem .7rem;font-size:.73rem;font-family:'Inter',sans-serif;background:var(--white);cursor:pointer;color:var(--ink);outline:none;transition:border-color .18s}
+.stage-sel:focus{border-color:var(--teal)}
+
+/* Toast */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--ink);color:#fff;padding:.75rem 1.2rem;border-radius:var(--r);font-size:.8rem;font-weight:500;box-shadow:var(--sh2);z-index:9999;display:none;animation:fadeUp .3s ease;border-left:3px solid var(--teal)}
+
+/* Misc */
+.sep{height:1px;background:var(--pale2);margin:1rem 0}
+.alert{padding:.8rem 1rem;border-radius:var(--r);font-size:.8rem;display:flex;align-items:flex-start;gap:.6rem;line-height:1.55}
+.alert-info{background:var(--info-bg);border:1px solid rgba(2,132,199,.2);color:var(--info)}
+.alert-warn{background:var(--warn-bg);border:1px solid rgba(217,119,6,.2);color:var(--warn)}
+
+/* Responsive */
+@media(max-width:900px){
+  .sidebar,.admin-sidebar{transform:translateX(-100%)}
+  .sidebar.open,.admin-sidebar.open{transform:none}
+  .portal-main,.admin-main{margin-left:0}
+  .g2,.g3,.g4,.cal-wrap,.session-cards{grid-template-columns:1fr}
+  .auth-left{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: AUTH
+═══════════════════════════════════════ -->
+<div class="screen on" id="s-auth">
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="auth-logo">NCLEX <span>Pro</span></div>
+      <div class="auth-tagline">Client Portal</div>
+    </div>
+    <div style="position:relative;z-index:1">
+      <p style="color:rgba(255,255,255,.5);font-size:.875rem;line-height:1.75;margin-bottom:1.5rem">Your complete NCLEX journey — managed in one place. Track your application, upload documents, book sessions, and practice questions.</p>
+      <div style="display:flex;flex-direction:column;gap:.85rem">
+        <div style="display:flex;align-items:center;gap:.75rem"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,176,155,.15);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">◎</div><div style="color:rgba(255,255,255,.65);font-size:.82rem">Track your 6-stage application pipeline in real time</div></div>
+        <div style="display:flex;align-items:center;gap:.75rem"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,176,155,.15);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">📅</div><div style="color:rgba(255,255,255,.65);font-size:.82rem">Book coaching sessions directly with Tilly</div></div>
+        <div style="display:flex;align-items:center;gap:.75rem"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,176,155,.15);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">📚</div><div style="color:rgba(255,255,255,.65);font-size:.82rem">Practice NCLEX questions with AI-powered explanations</div></div>
+        <div style="display:flex;align-items:center;gap:.75rem"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,176,155,.15);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">💳</div><div style="color:rgba(255,255,255,.65);font-size:.82rem">Pay securely online — card, MoMo, or bank transfer</div></div>
+        <div style="display:flex;align-items:center;gap:.75rem"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,176,155,.15);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">📁</div><div style="color:rgba(255,255,255,.65);font-size:.82rem">Upload and manage all your application documents</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box fadein">
+      <h2 class="auth-box-title" id="auth-title">Welcome back</h2>
+      <p class="auth-box-sub" id="auth-sub">Sign in to your NCLEX Pro Solutions account</p>
+      <div class="auth-tabs">
+        <div class="auth-tab on" onclick="switchAuthTab('login',this)">Sign In</div>
+        <div class="auth-tab" onclick="switchAuthTab('register',this)">Create Account</div>
+        <div class="auth-tab" onclick="switchAuthTab('admin',this)">Admin</div>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="f-login">
+        <div class="fg"><label>Email address <span class="req">*</span></label><input type="email" id="l-email" placeholder="your@email.com"/></div>
+        <div class="fg"><label>Password <span class="req">*</span></label><input type="password" id="l-pw" placeholder="Your password"/></div>
+        <div class="err" id="l-err" style="display:none;margin-bottom:.75rem">Incorrect credentials. Demo: client@test.com / pass123</div>
+        <button class="btn btn-primary btn-block btn-lg" style="margin-top:.25rem" onclick="doLogin()">Sign In →</button>
+        <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:1rem">Demo: <strong>client@test.com</strong> / <strong>pass123</strong></p>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="f-register" style="display:none">
+        <div class="fg-row">
+          <div class="fg"><label>First name <span class="req">*</span></label><input type="text" placeholder="Abena"/></div>
+          <div class="fg"><label>Last name <span class="req">*</span></label><input type="text" placeholder="Mensah"/></div>
+        </div>
+        <div class="fg"><label>Email address <span class="req">*</span></label><input type="email" placeholder="your@email.com"/></div>
+        <div class="fg"><label>WhatsApp number <span class="req">*</span></label><input type="tel" placeholder="+233 XX XXX XXXX"/></div>
+        <div class="fg"><label>Password <span class="req">*</span></label><input type="password" placeholder="Minimum 8 characters"/></div>
+        <div class="fg"><label>Service package <span class="req">*</span></label>
+          <select><option value="">Select a package</option><option>Full Package (Registration + Coaching)</option><option>NCLEX Coaching Only</option><option>Retakers Intensive Programme</option><option>Credential Evaluation Only</option></select>
+        </div>
+        <button class="btn btn-primary btn-block btn-lg" style="margin-top:.25rem" onclick="doRegister()">Create Account →</button>
+      </div>
+
+      <!-- ADMIN -->
+      <div id="f-admin" style="display:none">
+        <div class="alert alert-warn" style="margin-bottom:1rem">⚠️ Restricted access — authorised personnel only</div>
+        <div class="fg"><label>Admin email</label><input type="email" placeholder="admin@nclexprosolutions.com"/></div>
+        <div class="fg"><label>Admin password</label><input type="password" placeholder="Admin password" id="adm-pw"/></div>
+        <div class="err" id="adm-err" style="display:none;margin-bottom:.75rem">Invalid. Demo: admin@nclex.com / admin123</div>
+        <button class="btn btn-navy btn-block btn-lg" style="margin-top:.25rem" onclick="doAdminLogin()">Admin Sign In →</button>
+        <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:1rem">Demo: <strong>admin@nclex.com</strong> / <strong>admin123</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: CLIENT PORTAL
+═══════════════════════════════════════ -->
+<div class="screen" id="s-portal">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo">NCLEX <span>Pro</span></div>
+      <div class="sb-user">
+        <div class="sb-avatar" id="sb-av">AM</div>
+        <div>
+          <div class="sb-name" id="sb-name">Abena Mensah</div>
+          <div class="sb-ref" id="sb-ref">NPS-2025-0847</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Main</div>
+      <a class="sb-item on" onclick="goSection('pt-dash',this)"><span class="si">⊞</span> Dashboard</a>
+      <a class="sb-item" onclick="goSection('pt-track',this)"><span class="si">◎</span> My Journey <span class="sb-badge gold">3/6</span></a>
+      <div class="sb-section">Application</div>
+      <a class="sb-item" onclick="goSection('pt-reg',this)"><span class="si">✎</span> Application Form</a>
+      <a class="sb-item" onclick="goSection('pt-docs',this)"><span class="si">◫</span> Documents <span class="sb-badge">1</span></a>
+      <div class="sb-section">Services</div>
+      <a class="sb-item" onclick="goSection('pt-book',this)"><span class="si">◷</span> Book a Session</a>
+      <a class="sb-item" onclick="goSection('pt-pay',this)"><span class="si">◈</span> Payments</a>
+      <div class="sb-section">Practice</div>
+      <a class="sb-item" onclick="goSection('pt-qbank',this)"><span class="si">◉</span> Question Bank</a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-logout" onclick="logout()"><span>⎋</span> Sign out</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="portal-main">
+    <header class="portal-topbar">
+      <div>
+        <div class="topbar-title" id="tp-title">Dashboard</div>
+        <div class="topbar-sub" id="tp-sub">Welcome back, Abena</div>
+      </div>
+      <div class="topbar-actions">
+        <a href="https://wa.me/233504299230" class="topbar-wa" target="_blank">💬 WhatsApp Tilly</a>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>
+      </div>
+    </header>
+
+    <div class="portal-body">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="portal-section on" id="pt-dash">
+        <!-- Welcome bar -->
+        <div class="welcome-bar fadein">
+          <div style="position:relative;z-index:1">
+            <div class="welcome-h">Good day, <em id="dash-name">Abena</em></div>
+            <div class="welcome-sub">Your NCLEX journey is in progress. Here is where things stand today.</div>
+            <div class="welcome-ref"><div class="dot dot-teal"></div> Application Reference: <strong id="dash-ref">NPS-2025-0847</strong> &nbsp;·&nbsp; Package: Full Package</div>
+          </div>
+        </div>
+
+        <!-- Stat row -->
+        <div class="g4" style="margin-bottom:1.5rem">
+          <div class="stat-card">
+            <div class="stat-icon teal">◎</div>
+            <div class="stat-val">3 / 6</div>
+            <div class="stat-label">Current Stage</div>
+            <div class="stat-sub warn">⏳ Credential Evaluation</div>
+          </div>
+          <div class="stat-card gold">
+            <div class="stat-icon gold">◈</div>
+            <div class="stat-val">GHS 890</div>
+            <div class="stat-label">Balance Outstanding</div>
+            <div class="stat-sub warn">Due 14 Jun 2025</div>
+          </div>
+          <div class="stat-card navy">
+            <div class="stat-icon navy">◫</div>
+            <div class="stat-val">4 / 5</div>
+            <div class="stat-label">Documents Submitted</div>
+            <div class="stat-sub warn">⚠ Birth cert pending</div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-icon success">◉</div>
+            <div class="stat-val">47</div>
+            <div class="stat-label">Questions Practised</div>
+            <div class="stat-sub up">↑ 8 this week</div>
+          </div>
+        </div>
+
+        <!-- Progress + Activity -->
+        <div class="g2" style="margin-bottom:1.5rem">
+          <div class="card card-pad">
+            <div class="card-title">Application Pipeline</div>
+            <div class="pipeline-track" style="--prog:36%">
+              <div class="pip-step done" onclick="showPip(0)"><div class="pip-dot"><span class="pip-emoji">📋</span></div><div class="pip-label">Registration</div><div class="pip-status-txt">Done</div></div>
+              <div class="pip-step done" onclick="showPip(1)"><div class="pip-dot"><span class="pip-emoji">📬</span></div><div class="pip-label">Documents</div><div class="pip-status-txt">Done</div></div>
+              <div class="pip-step active" onclick="showPip(2)"><div class="pip-dot"><span class="pip-emoji">🔍</span></div><div class="pip-label">Credential Eval</div><div class="pip-status-txt">Active</div></div>
+              <div class="pip-step pending" onclick="showPip(3)"><div class="pip-dot"><span class="pip-emoji">📝</span></div><div class="pip-label">Board App</div><div class="pip-status-txt">Pending</div></div>
+              <div class="pip-step pending" onclick="showPip(4)"><div class="pip-dot"><span class="pip-emoji">🎯</span></div><div class="pip-label">Coaching</div><div class="pip-status-txt">Pending</div></div>
+              <div class="pip-step pending" onclick="showPip(5)"><div class="pip-dot"><span class="pip-emoji">🏆</span></div><div class="pip-label">Licensed</div><div class="pip-status-txt">Pending</div></div>
+            </div>
+            <div class="detail-panel" id="pip-panel">
+              <div class="dp-title" id="pip-title">🔍 Credential Evaluation — In Progress</div>
+              <div class="dp-desc" id="pip-desc">Your documents have been submitted to Trumerit/CGFNS. This process takes 8–12 weeks. We monitor your application daily.</div>
+              <div class="dp-meta" id="pip-meta">Submitted 15 May 2025 · Trumerit Ref: TRM-84729 · Est. Aug 2025</div>
+            </div>
+          </div>
+
+          <div class="card card-pad">
+            <div class="card-title">Recent Activity</div>
+            <div class="tl">
+              <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Credential evaluation submitted</div><div class="tl-date">15 May 2025</div><div class="tl-note">Trumerit Ref: TRM-84729</div></div></div>
+              <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">All 4 documents verified ✓</div><div class="tl-date">10 May 2025</div></div></div>
+              <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Welcome call with Tilly completed</div><div class="tl-date">5 May 2025</div></div></div>
+              <div class="tl-item"><div class="tl-line"><div class="tl-dot2 warn"></div></div><div class="tl-content"><div class="tl-title" style="color:var(--warn)">Birth certificate — still needed</div><div class="tl-date" style="color:var(--warn)">Action required</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="g3">
+          <div class="card card-pad" style="cursor:pointer;border-color:var(--pale2);transition:all .2s" onclick="goSection('pt-book',document.querySelectorAll('.sb-item')[5])" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--pale2)'">
+            <div style="font-size:1.4rem;margin-bottom:.6rem">📅</div>
+            <div style="font-weight:600;font-size:.875rem;color:var(--ink);margin-bottom:.2rem">Book a Session</div>
+            <div style="font-size:.75rem;color:var(--muted)">Schedule time with Tilly</div>
+          </div>
+          <div class="card card-pad" style="cursor:pointer;transition:all .2s" onclick="goSection('pt-pay',document.querySelectorAll('.sb-item')[6])" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--pale2)'">
+            <div style="font-size:1.4rem;margin-bottom:.6rem">💳</div>
+            <div style="font-weight:600;font-size:.875rem;color:var(--ink);margin-bottom:.2rem">Make Payment</div>
+            <div style="font-size:.75rem;color:var(--warn)">GHS 890 outstanding</div>
+          </div>
+          <div class="card card-pad" style="cursor:pointer;transition:all .2s" onclick="goSection('pt-qbank',document.querySelectorAll('.sb-item')[8])" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--pale2)'">
+            <div style="font-size:1.4rem;margin-bottom:.6rem">📚</div>
+            <div style="font-weight:600;font-size:.875rem;color:var(--ink);margin-bottom:.2rem">Practice Questions</div>
+            <div style="font-size:.75rem;color:var(--muted)">47 done · keep going</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MY JOURNEY (TRACKER) ── -->
+      <div class="portal-section" id="pt-track">
+        <div class="g2" style="margin-bottom:1.25rem">
+          <div class="card card-pad">
+            <div class="card-title">Application Status</div>
+            <div class="data-row"><span class="data-key">Reference</span><span class="data-val">NPS-2025-0847</span></div>
+            <div class="data-row"><span class="data-key">Package</span><span class="data-val">Full Package</span></div>
+            <div class="data-row"><span class="data-key">Target Country</span><span class="data-val">🇺🇸 United States — Texas</span></div>
+            <div class="data-row"><span class="data-key">Qualification</span><span class="data-val">RN – BSc Nursing</span></div>
+            <div class="data-row"><span class="data-key">Coach</span><span class="data-val">Matilda Osae</span></div>
+            <div class="data-row"><span class="data-key">Status</span><span class="badge b-warn"><span class="dot dot-warn"></span> In Progress</span></div>
+          </div>
+          <div class="card card-pad">
+            <div class="card-title">Document Status</div>
+            <div class="data-row"><span class="data-key">Passport</span><span class="badge b-success">✓ Verified</span></div>
+            <div class="data-row"><span class="data-key">NMC Licence</span><span class="badge b-success">✓ Verified</span></div>
+            <div class="data-row"><span class="data-key">Transcripts</span><span class="badge b-success">✓ Verified</span></div>
+            <div class="data-row"><span class="data-key">Certificate</span><span class="badge b-teal">Under Review</span></div>
+            <div class="data-row"><span class="data-key">Birth Certificate</span><span class="badge b-warn">⚠ Needed</span></div>
+          </div>
+        </div>
+
+        <div class="card card-pad" style="margin-bottom:1.25rem">
+          <div class="card-title">Your 6-Stage Pipeline</div>
+          <div class="pipeline-track" style="--prog:36%">
+            <div class="pip-step done" onclick="showPip(0)"><div class="pip-dot"><span class="pip-emoji">📋</span></div><div class="pip-label">Registration</div><div class="pip-status-txt">Completed</div></div>
+            <div class="pip-step done" onclick="showPip(1)"><div class="pip-dot"><span class="pip-emoji">📬</span></div><div class="pip-label">Documents</div><div class="pip-status-txt">Completed</div></div>
+            <div class="pip-step active" onclick="showPip(2)"><div class="pip-dot"><span class="pip-emoji">🔍</span></div><div class="pip-label">Credential Eval</div><div class="pip-status-txt">In Progress</div></div>
+            <div class="pip-step pending" onclick="showPip(3)"><div class="pip-dot"><span class="pip-emoji">📝</span></div><div class="pip-label">Board Application</div><div class="pip-status-txt">Pending</div></div>
+            <div class="pip-step pending" onclick="showPip(4)"><div class="pip-dot"><span class="pip-emoji">🎯</span></div><div class="pip-label">NCLEX Coaching</div><div class="pip-status-txt">Pending</div></div>
+            <div class="pip-step pending" onclick="showPip(5)"><div class="pip-dot"><span class="pip-emoji">🏆</span></div><div class="pip-label">Pass & Licensed</div><div class="pip-status-txt">Pending</div></div>
+          </div>
+          <div class="detail-panel" id="pip-panel2">
+            <div class="dp-title">🔍 Credential Evaluation — In Progress</div>
+            <div class="dp-desc">Your documents have been submitted to Trumerit/CGFNS for evaluation. This process typically takes 8–12 weeks. We monitor your application daily and will notify you immediately of any update.</div>
+            <div class="dp-meta">Submitted 15 May 2025 · Trumerit Ref: TRM-84729 · Est. completion: August 2025</div>
+          </div>
+        </div>
+
+        <div class="card card-pad">
+          <div class="card-title">Activity Log</div>
+          <div class="tl">
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Credential evaluation submitted to Trumerit</div><div class="tl-date">15 May 2025</div><div class="tl-note">Reference: TRM-84729. Monitoring in progress.</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">All documents verified — Passport, NMC, Transcripts, Certificate</div><div class="tl-date">10 May 2025</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Strategy call completed with Tilly — Texas board selected</div><div class="tl-date">5 May 2025</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Registration received and confirmed</div><div class="tl-date">2 May 2025</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2 warn"></div></div><div class="tl-content"><div class="tl-title" style="color:var(--warn)">Birth certificate still required</div><div class="tl-date" style="color:var(--warn)">Please upload as soon as possible</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── APPLICATION FORM ── -->
+      <div class="portal-section" id="pt-reg">
+        <div id="reg-form">
+          <div class="reg-steps">
+            <div class="rs-step on" id="rs1"><div class="rs-num">1</div> Personal</div>
+            <div class="rs-sep"></div>
+            <div class="rs-step" id="rs2"><div class="rs-num">2</div> Nursing</div>
+            <div class="rs-sep"></div>
+            <div class="rs-step" id="rs3"><div class="rs-num">3</div> Pathway</div>
+            <div class="rs-sep"></div>
+            <div class="rs-step" id="rs4"><div class="rs-num">4</div> Documents</div>
+          </div>
+
+          <div class="card card-pad" style="max-width:680px">
+            <!-- Step 1 -->
+            <div class="reg-section on" id="rss1">
+              <div class="sec-label">Personal Information</div>
+              <div class="fg-row"><div class="fg"><label>First name <span class="req">*</span></label><input type="text" placeholder="Abena"/></div><div class="fg"><label>Last name <span class="req">*</span></label><input type="text" placeholder="Mensah"/></div></div>
+              <div class="fg-row"><div class="fg"><label>Date of birth <span class="req">*</span></label><input type="date"/></div><div class="fg"><label>Gender <span class="req">*</span></label><select><option value="">Select</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select></div></div>
+              <div class="fg-row"><div class="fg"><label>Passport number <span class="req">*</span></label><input type="text" placeholder="G12345678"/></div><div class="fg"><label>WhatsApp number <span class="req">*</span></label><input type="tel" placeholder="+233 XX XXX XXXX"/></div></div>
+              <div class="fg"><label>Residential address <span class="req">*</span></label><input type="text" placeholder="Street, City, Region, Country"/></div>
+              <div class="fg-row"><div class="fg"><label>Country of residence <span class="req">*</span></label><select><option value="">Select</option><option>Ghana</option><option>Nigeria</option><option>Sierra Leone</option><option>Kenya</option><option>United Kingdom</option><option>United States</option><option>Canada</option><option>Australia</option><option>Other</option></select></div><div class="fg"><label>SSN (US applicants only)</label><input type="text" placeholder="XXX-XX-XXXX"/></div></div>
+              <div style="display:flex;justify-content:flex-end;margin-top:1rem"><button class="btn btn-primary" onclick="rNext(1)">Next: Nursing Background →</button></div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="reg-section" id="rss2">
+              <div class="sec-label">Nursing Background</div>
+              <div class="fg-row"><div class="fg"><label>Nursing school <span class="req">*</span></label><input type="text" placeholder="University of Ghana"/></div><div class="fg"><label>Year of graduation <span class="req">*</span></label><input type="number" placeholder="2019" min="1980" max="2025"/></div></div>
+              <div class="fg-row"><div class="fg"><label>Qualification <span class="req">*</span></label><select><option value="">Select</option><option>RN – BSc Nursing</option><option>RN – Diploma</option><option>RM – Registered Midwife</option><option>RPHN – Public Health Nurse</option><option>EN – Enrolled Nurse</option></select></div><div class="fg"><label>NMC licence number <span class="req">*</span></label><input type="text" placeholder="NMC/RN/XXXXX"/></div></div>
+              <div class="fg-row"><div class="fg"><label>NMC expiry date <span class="req">*</span></label><input type="date"/></div><div class="fg"><label>Years of experience <span class="req">*</span></label><select><option value="">Select</option><option>Less than 1 year</option><option>1–2 years</option><option>3–5 years</option><option>6–10 years</option><option>10+ years</option></select></div></div>
+              <div class="fg"><label>Clinical speciality</label><input type="text" placeholder="e.g. General Nursing, ICU, Paediatrics"/></div>
+              <div class="fg"><label>Previous NCLEX attempts <span class="req">*</span></label><select id="prev-att" onchange="document.getElementById('prev-det').style.display=this.value==='yes'?'block':'none'"><option value="">Select</option><option value="no">No — first attempt</option><option value="yes">Yes — attempted before</option></select></div>
+              <div class="fg" id="prev-det" style="display:none"><label>Details of previous attempts</label><textarea style="width:100%;padding:.68rem .9rem;border:1.5px solid var(--pale2);border-radius:var(--r);font-size:.85rem;font-family:'Inter',sans-serif;resize:vertical;min-height:70px;outline:none" placeholder="How many times? Which state? When was your last attempt?"></textarea></div>
+              <div style="display:flex;justify-content:space-between;margin-top:1rem"><button class="btn btn-ghost" onclick="rBack(2)">← Back</button><button class="btn btn-primary" onclick="rNext(2)">Next: Pathway →</button></div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="reg-section" id="rss3">
+              <div class="sec-label">Target Country & Pathway</div>
+              <div class="fg-row"><div class="fg"><label>Target country <span class="req">*</span></label><select><option value="">Select destination</option><option>United States</option><option>Canada</option><option>Australia</option><option>United Kingdom</option><option>New Zealand</option></select></div><div class="fg"><label>Preferred US state</label><select><option value="">Select state</option><option>California</option><option>Texas</option><option>New York</option><option>Florida</option><option>Georgia</option><option>Maryland</option><option>Not decided</option></select></div></div>
+              <div class="fg-row"><div class="fg"><label>Service package <span class="req">*</span></label><select><option value="">Select package</option><option>Full Package</option><option>NCLEX Coaching Only</option><option>Credential Evaluation Only</option><option>Retakers Programme</option></select></div><div class="fg"><label>How did you hear about us?</label><select><option value="">Select</option><option>WhatsApp</option><option>Facebook</option><option>TikTok</option><option>Instagram</option><option>YouTube</option><option>Referral</option><option>Google</option></select></div></div>
+              <div class="fg-row"><div class="fg"><label>Referral name</label><input type="text" placeholder="Name of person who referred you"/></div><div class="fg"><label>Timeline <span class="req">*</span></label><select><option value="">Select</option><option>Within 3 months</option><option>Within 6 months</option><option>Within 12 months</option><option>No fixed timeline</option></select></div></div>
+              <div class="fg"><label>Notes for Tilly</label><textarea style="width:100%;padding:.68rem .9rem;border:1.5px solid var(--pale2);border-radius:var(--r);font-size:.85rem;font-family:'Inter',sans-serif;resize:vertical;min-height:70px;outline:none" placeholder="Any specific concerns, questions, or details Tilly should know"></textarea></div>
+              <div style="display:flex;justify-content:space-between;margin-top:1rem"><button class="btn btn-ghost" onclick="rBack(3)">← Back</button><button class="btn btn-primary" onclick="rNext(3)">Next: Documents →</button></div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="reg-section" id="rss4">
+              <div class="sec-label">Document Uploads</div>
+              <div class="alert alert-info" style="margin-bottom:1.1rem">🔒 Files are encrypted and stored securely. Accepted formats: PDF, JPG, PNG — max 5MB each.</div>
+              <div class="fg-row">
+                <div class="fg"><label>Passport Biodata Page <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">🛂</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
+                <div class="fg"><label>NMC Licence <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📋</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
+                <div class="fg"><label>Nursing Certificate <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">🎓</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
+                <div class="fg"><label>Official Transcripts <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📄</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
+                <div class="fg"><label>Birth Certificate</label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📜</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
+                <div class="fg"><label>Other Supporting Document</label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📁</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:.6rem;margin:1rem 0"><input type="checkbox" id="consent" style="width:15px;height:15px;accent-color:var(--teal);flex-shrink:0;margin-top:2px"/><label for="consent" style="font-size:.78rem;color:var(--muted);cursor:pointer">I confirm all information is accurate and I consent to NCLEX Pro Solutions processing my data for the purpose of my application.</label></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><button class="btn btn-ghost" onclick="rBack(4)">← Back</button><button class="btn btn-primary btn-lg" onclick="submitReg()">Submit Application ✓</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="success-state fadein" id="reg-success" style="display:none">
+          <span class="success-icon">🎉</span>
+          <h2 class="success-title">Application Submitted</h2>
+          <p class="success-sub">Your details have been received. Tilly and her team will review your application<br>and contact you within <strong>24–48 hours</strong> via WhatsApp and email.</p>
+          <div class="ref-box"><div class="ref-label">Your Reference Number</div><div class="ref-code" id="reg-ref">NPS-2025-0847</div></div>
+          <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="goSection('pt-track',document.querySelectorAll('.sb-item')[1])">Track My Progress →</button>
+            <button class="btn btn-ghost" onclick="goSection('pt-pay',document.querySelectorAll('.sb-item')[6])">Make a Payment</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DOCUMENTS ── -->
+      <div class="portal-section" id="pt-docs">
+        <div class="g2" style="margin-bottom:1.25rem">
+          <div class="card card-pad">
+            <div class="card-title">Upload a Document</div>
+            <div class="fg"><label>Document type</label><select style="width:100%;padding:.68rem .9rem;border:1.5px solid var(--pale2);border-radius:var(--r);font-size:.85rem;font-family:'Inter',sans-serif;outline:none"><option>Birth Certificate</option><option>Passport</option><option>NMC Licence</option><option>Other</option></select></div>
+            <div class="file-drop" onclick="this.querySelector('input').click()" style="margin-top:.5rem"><div class="file-drop-icon">📤</div><strong>Click to upload</strong><p>PDF, JPG, PNG · Max 5MB</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div>
+          </div>
+          <div class="card card-pad">
+            <div class="card-title">Document Checklist</div>
+            <div class="data-row"><span class="data-key">Passport</span><span class="badge b-success">✓ Verified</span></div>
+            <div class="data-row"><span class="data-key">NMC Licence</span><span class="badge b-success">✓ Verified</span></div>
+            <div class="data-row"><span class="data-key">Nursing Certificate</span><span class="badge b-success">✓ Verified</span></div>
+            <div class="data-row"><span class="data-key">Official Transcripts</span><span class="badge b-teal">Under Review</span></div>
+            <div class="data-row"><span class="data-key">Birth Certificate</span><span class="badge b-warn">⚠ Required</span></div>
+          </div>
+        </div>
+        <div class="card card-pad">
+          <div class="card-title">Uploaded Documents</div>
+          <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">📄</div><div><div class="doc-name">Passport_Biodata.pdf</div><div class="doc-meta">1.2 MB · Uploaded 8 May 2025</div></div></div><span class="badge b-success">✓ Verified</span></div>
+          <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">📋</div><div><div class="doc-name">NMC_Licence_2024.pdf</div><div class="doc-meta">0.8 MB · Uploaded 8 May 2025</div></div></div><span class="badge b-success">✓ Verified</span></div>
+          <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">🎓</div><div><div class="doc-name">BSc_Nursing_Certificate.pdf</div><div class="doc-meta">2.1 MB · Uploaded 9 May 2025</div></div></div><span class="badge b-success">✓ Verified</span></div>
+          <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">📄</div><div><div class="doc-name">Official_Transcripts.pdf</div><div class="doc-meta">3.4 MB · Uploaded 9 May 2025</div></div></div><span class="badge b-teal">Under Review</span></div>
+        </div>
+      </div>
+
+      <!-- ── BOOKING ── -->
+      <div class="portal-section" id="pt-book">
+        <div id="book-main">
+          <div class="session-cards" style="margin-bottom:1.25rem" id="sess-cards">
+            <div class="sess-card sel" onclick="selSess(this,'Free Discovery Call','Free','30 min')"><div class="sess-check">✓</div><div class="sess-name">Free Discovery Call</div><div class="sess-price">Free <small>· 30 min</small></div><div class="sess-desc">First-time clients — discuss your pathway with Tilly.</div></div>
+            <div class="sess-card" onclick="selSess(this,'Coaching Session','GHS 250','60 min')"><div class="sess-check"></div><div class="sess-name">Coaching Session</div><div class="sess-price">GHS 250 <small>· 60 min</small></div><div class="sess-desc">Content review, strategy, and practice questions.</div></div>
+            <div class="sess-card" onclick="selSess(this,'Application Review','GHS 150','45 min')"><div class="sess-check"></div><div class="sess-name">Application Review</div><div class="sess-price">GHS 150 <small>· 45 min</small></div><div class="sess-desc">Review your credential status or documents.</div></div>
+            <div class="sess-card" onclick="selSess(this,'Retaker Strategy','GHS 300','90 min')"><div class="sess-check"></div><div class="sess-name">Retaker Strategy</div><div class="sess-price">GHS 300 <small>· 90 min</small></div><div class="sess-desc">Deep-dive into gaps and build your retest plan.</div></div>
+          </div>
+          <div class="cal-wrap">
+            <div class="card card-pad">
+              <div class="card-title">Choose a Date</div>
+              <div class="cal-month"><button class="cal-nav-btn" onclick="chgMo(-1)">‹</button><span class="cal-month-title" id="cal-lbl">June 2025</span><button class="cal-nav-btn" onclick="chgMo(1)">›</button></div>
+              <div class="cal-grid" id="cal-grid"></div>
+              <p style="font-size:.68rem;color:var(--faint);margin-top:.6rem">Mon–Sat only · Min 24hr notice required</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:1.1rem">
+              <div class="card card-pad">
+                <div class="card-title">Choose a Time <span style="color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">(GMT)</span></div>
+                <div class="time-slots">
+                  <div class="ts" onclick="selTime(this)">8:00 AM</div><div class="ts" onclick="selTime(this)">9:00 AM</div>
+                  <div class="ts bkd">10:00 AM</div><div class="ts" onclick="selTime(this)">11:00 AM</div>
+                  <div class="ts bkd">12:00 PM</div><div class="ts" onclick="selTime(this)">1:00 PM</div>
+                  <div class="ts" onclick="selTime(this)">2:00 PM</div><div class="ts bkd">3:00 PM</div>
+                  <div class="ts" onclick="selTime(this)">4:00 PM</div><div class="ts" onclick="selTime(this)">5:00 PM</div>
+                  <div class="ts" onclick="selTime(this)">6:00 PM</div><div class="ts" onclick="selTime(this)">7:00 PM</div>
+                </div>
+                <p style="font-size:.68rem;color:var(--faint);margin-top:.5rem">Grey = already booked · Sessions via Google Meet or WhatsApp</p>
+              </div>
+              <div class="card card-pad" style="background:var(--navy)">
+                <div style="font-weight:600;color:#fff;font-size:.875rem;margin-bottom:.85rem">Booking Summary</div>
+                <div class="ps-row"><span class="ps-key">Session</span><span class="ps-val" id="b-sess">Free Discovery Call</span></div>
+                <div class="ps-row"><span class="ps-key">Date</span><span class="ps-val" id="b-date">Not selected</span></div>
+                <div class="ps-row"><span class="ps-key">Time (GMT)</span><span class="ps-val" id="b-time">Not selected</span></div>
+                <div class="ps-row"><span class="ps-key">Duration</span><span class="ps-val" id="b-dur">30 min</span></div>
+                <div class="ps-row"><span class="ps-key">Cost</span><span class="ps-val ps-total" id="b-price">Free</span></div>
+                <div class="sep" style="border-color:rgba(255,255,255,.08)"></div>
+                <input class="dark-input" type="text" placeholder="Your full name" style="margin-bottom:.6rem"/>
+                <input class="dark-input" type="tel" placeholder="WhatsApp number"/>
+                <button class="btn btn-primary btn-block" style="border-radius:var(--r);margin-top:.25rem" onclick="confirmBook()">Confirm Booking →</button>
+                <div class="secure-note">📅 WhatsApp confirmation within 1 hour</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="success-state fadein" id="book-success" style="display:none">
+          <span class="success-icon">📅</span>
+          <h2 class="success-title">Session Booked</h2>
+          <p class="success-sub">You will receive a WhatsApp confirmation with your meeting link within <strong>1 hour</strong>.</p>
+          <div class="ref-box"><div class="ref-label">Booking Reference</div><div class="ref-code">BK-2025-0421</div></div>
+          <button class="btn btn-primary" onclick="document.getElementById('book-main').style.display='block';document.getElementById('book-success').style.display='none'">Book Another Session</button>
+        </div>
+      </div>
+
+      <!-- ── PAYMENTS ── -->
+      <div class="portal-section" id="pt-pay">
+        <div id="pay-main">
+          <div class="g2">
+            <div>
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Outstanding Balance</div>
+                <div style="background:var(--warn-bg);border:1px solid rgba(217,119,6,.2);border-radius:var(--r);padding:1rem;margin-bottom:1rem">
+                  <div style="font-size:.72rem;color:var(--warn);font-weight:600;margin-bottom:.2rem">Amount Due</div>
+                  <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--ink)">GHS 890</div>
+                  <div style="font-size:.72rem;color:var(--muted)">Full Package Balance · Invoice INV-2025-001</div>
+                </div>
+                <div class="data-row"><span class="data-key">Package total</span><span class="data-val">GHS 2,500</span></div>
+                <div class="data-row"><span class="data-key">Paid to date</span><span class="data-val" style="color:var(--success)">GHS 1,610</span></div>
+                <div class="data-row"><span class="data-key">Remaining</span><span class="data-val" style="color:var(--warn)">GHS 890</span></div>
+              </div>
+              <div class="card card-pad">
+                <div class="card-title">Select Payment</div>
+                <div class="plan-list" id="plan-list">
+                  <div class="plan-item sel" onclick="selPlan(this,'Full Package Balance',890)"><div class="plan-chk">✓</div><div class="plan-name">Full Package Balance <span class="plan-badge">Due</span></div><div class="plan-price">GHS 890</div><div class="plan-desc">Clear your remaining balance.</div></div>
+                  <div class="plan-item" onclick="selPlan(this,'Single Coaching Session',250)"><div class="plan-chk"></div><div class="plan-name">Single Coaching Session</div><div class="plan-price">GHS 250</div><div class="plan-desc">One 60-minute session with Tilly.</div></div>
+                  <div class="plan-item" onclick="selPlan(this,'Application Review',150)"><div class="plan-chk"></div><div class="plan-name">Application Review Session</div><div class="plan-price">GHS 150</div><div class="plan-desc">45-minute document or status review.</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card card-pad" style="background:var(--navy);height:fit-content;position:sticky;top:80px">
+              <div class="ps-title">Secure Checkout</div>
+              <div class="pay-methods">
+                <div class="pm on" onclick="swPM(this,'card')">💳 Card</div>
+                <div class="pm" onclick="swPM(this,'momo')">📱 MoMo</div>
+                <div class="pm" onclick="swPM(this,'bank')">🏦 Bank</div>
+              </div>
+              <div id="pm-card">
+                <input class="dark-input" type="text" placeholder="Name on card"/>
+                <input class="dark-input" type="text" placeholder="Card number" maxlength="19"/>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
+                  <input class="dark-input" type="text" placeholder="MM / YY" maxlength="7" style="margin:0"/>
+                  <input class="dark-input" type="text" placeholder="CVV" maxlength="4" style="margin:0"/>
+                </div>
+                <div style="height:.65rem"></div>
+              </div>
+              <div id="pm-momo" style="display:none">
+                <div class="momo-nets"><div class="momo-net on" onclick="selMomo(this)">MTN</div><div class="momo-net" onclick="selMomo(this)">Vodafone</div><div class="momo-net" onclick="selMomo(this)">AirtelTigo</div></div>
+                <input class="dark-input" type="tel" placeholder="Mobile Money number"/>
+                <input class="dark-input" type="text" placeholder="Account name"/>
+              </div>
+              <div id="pm-bank" style="display:none">
+                <div style="background:rgba(255,255,255,.06);border-radius:var(--r);padding:.85rem;margin-bottom:.75rem;font-size:.8rem;color:rgba(255,255,255,.65);line-height:1.8"><strong style="color:#fff">Bank:</strong> GCB Bank Ghana<br><strong style="color:#fff">Account:</strong> Nurses Pathway Solutions<br><strong style="color:#fff">Account No:</strong> 1234567890123</div>
+                <input class="dark-input" type="text" placeholder="Your full name (for reference)"/>
+              </div>
+              <div class="sep" style="border-color:rgba(255,255,255,.08)"></div>
+              <div class="ps-row"><span class="ps-key">Item</span><span class="ps-val" id="pay-item">Full Package Balance</span></div>
+              <div class="ps-row"><span class="ps-key">Processing fee</span><span class="ps-val">GHS 0</span></div>
+              <div class="ps-row"><span class="ps-key">Total</span><span class="ps-val ps-total" id="pay-total">GHS 890</span></div>
+              <div style="height:.75rem"></div>
+              <button class="btn btn-primary btn-block" style="border-radius:var(--r)" onclick="confirmPay()">Pay Now 🔒</button>
+              <div class="secure-note">256-bit SSL · Secured by Paystack</div>
+            </div>
+          </div>
+        </div>
+        <div class="success-state fadein" id="pay-success" style="display:none">
+          <span class="success-icon">✅</span>
+          <h2 class="success-title">Payment Confirmed</h2>
+          <p class="success-sub">Your payment has been received. Tilly will reach out within <strong>2 hours</strong>.</p>
+          <div class="ref-box"><div class="ref-label">Receipt Number</div><div class="ref-code">PAY-2025-7731</div></div>
+          <button class="btn btn-primary" onclick="goSection('pt-track',document.querySelectorAll('.sb-item')[1])">View My Progress →</button>
+        </div>
+      </div>
+
+      <!-- ── QUESTION BANK ── -->
+      <div class="portal-section" id="pt-qbank">
+        <div class="card card-pad" style="text-align:center;padding:3rem">
+          <div style="font-size:2.5rem;margin-bottom:1rem">📚</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:.5rem">NCLEX Question Bank</div>
+          <div style="color:var(--muted);font-size:.875rem;margin-bottom:1.5rem;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.65">85+ NCLEX practice questions — MCQ, SATA, Next Generation NCLEX types, case studies, and mock exams with AI-powered explanations.</div>
+          <a href="https://selordglobal.github.io/NCLEX-Pro-solutions/" target="_blank" class="btn btn-primary btn-lg">Open Question Bank →</a>
+          <p style="font-size:.72rem;color:var(--faint);margin-top:.9rem">Opens in a new tab · Powered by NCLEX Pro Solutions</p>
+        </div>
+      </div>
+
+    </div><!-- portal-body -->
+  </div><!-- portal-main -->
+</div><!-- s-portal -->
+
+<!-- ═══════════════════════════════════════
+     SCREEN: ADMIN
+═══════════════════════════════════════ -->
+<div class="screen" id="s-admin">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <div class="admin-brand-name">NCLEX <span>Pro</span></div>
+      <div class="admin-brand-role">Admin Dashboard</div>
+    </div>
+    <nav class="admin-nav">
+      <div class="admin-item on" onclick="adTab(this,'at-dash')">⊞ Overview</div>
+      <div class="admin-item" onclick="adTab(this,'at-clients')">👥 All Clients</div>
+      <div class="admin-item" onclick="adTab(this,'at-book')">📅 Bookings</div>
+      <div class="admin-item" onclick="adTab(this,'at-pay')">💳 Payments</div>
+      <div style="margin-top:auto;padding:1rem .6rem;border-top:1px solid rgba(255,255,255,.07)">
+        <div class="admin-item" style="color:rgba(255,255,255,.3)" onclick="logout()">⎋ Sign out</div>
+      </div>
+    </nav>
+  </aside>
+  <div class="admin-main">
+
+    <!-- OVERVIEW -->
+    <div id="at-dash">
+      <div class="admin-header">
+        <div class="admin-page-title">Good morning, Tilly 👋</div>
+        <div class="admin-page-sub">Here is your practice overview for today.</div>
+      </div>
+      <div class="g4" style="margin-bottom:1.5rem">
+        <div class="stat-card"><div class="stat-icon teal">👥</div><div class="stat-val">47</div><div class="stat-label">Active Clients</div><div class="stat-sub up">↑ 6 this month</div></div>
+        <div class="stat-card gold"><div class="stat-icon gold">⚠</div><div class="stat-val">3</div><div class="stat-label">Need Attention</div><div class="stat-sub warn">Action required</div></div>
+        <div class="stat-card"><div class="stat-icon teal">💳</div><div class="stat-val">GHS 14,250</div><div class="stat-label">Revenue This Month</div><div class="stat-sub up">↑ 18%</div></div>
+        <div class="stat-card success"><div class="stat-icon success">📅</div><div class="stat-val">8</div><div class="stat-label">Sessions This Week</div><div class="stat-sub">2 today</div></div>
+      </div>
+      <div class="g2">
+        <div class="card card-pad">
+          <div class="card-title">Action Required</div>
+          <div class="tl">
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2 warn"></div></div><div class="tl-content"><div class="tl-title">Kofi Asante — documents not yet verified</div><div class="tl-date">Submitted 1 Jun 2025</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2 warn"></div></div><div class="tl-content"><div class="tl-title">Abena Mensah — birth certificate missing</div><div class="tl-date">Reminder sent 28 May</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2 warn"></div></div><div class="tl-content"><div class="tl-title">Efua Darko — payment overdue GHS 500</div><div class="tl-date">Due 25 May 2025</div></div></div>
+          </div>
+        </div>
+        <div class="card card-pad">
+          <div class="card-title">Today's Sessions</div>
+          <div class="tl">
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Abena Mensah — Coaching Session</div><div class="tl-date">10:00 AM · 60 min · Google Meet</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Yaw Boateng — Application Review</div><div class="tl-date">2:00 PM · 45 min · WhatsApp</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL CLIENTS -->
+    <div id="at-clients" style="display:none">
+      <div class="admin-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+        <div><div class="admin-page-title">All Clients</div><div class="admin-page-sub">Update stages, view profiles, and manage your pipeline.</div></div>
+        <input style="padding:.6rem 1rem;border:1.5px solid var(--pale2);border-radius:50px;font-size:.8rem;font-family:'Inter',sans-serif;outline:none;min-width:240px" placeholder="🔍 Search by name or reference..." onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--pale2)'"/>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Client</th><th>Reference</th><th>Package</th><th>Stage</th><th>Payment</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><div style="font-weight:600">Abena Mensah</div><div style="font-size:.72rem;color:var(--muted)">abena@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0847</code></td><td>Full Package</td><td><select class="stage-sel" onchange="updStage(this,'0847')"><option>Registration</option><option>Documents</option><option selected>Credential Eval</option><option>Board Application</option><option>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-warn">GHS 890 due</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
+            <tr><td><div style="font-weight:600">Kofi Asante</div><div style="font-size:.72rem;color:var(--muted)">kofi@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0851</code></td><td>Coaching Only</td><td><select class="stage-sel" onchange="updStage(this,'0851')"><option selected>Registration</option><option>Documents</option><option>Credential Eval</option><option>Board Application</option><option>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-danger">Unpaid</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
+            <tr><td><div style="font-weight:600">Efua Darko</div><div style="font-size:.72rem;color:var(--muted)">efua@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0839</code></td><td>Retakers</td><td><select class="stage-sel" onchange="updStage(this,'0839')"><option>Registration</option><option>Documents</option><option>Credential Eval</option><option selected>Board Application</option><option>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-success">Paid ✓</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
+            <tr><td><div style="font-weight:600">Yaw Boateng</div><div style="font-size:.72rem;color:var(--muted)">yaw@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0821</code></td><td>Full Package</td><td><select class="stage-sel" onchange="updStage(this,'0821')"><option>Registration</option><option>Documents</option><option>Credential Eval</option><option>Board Application</option><option selected>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-success">Paid ✓</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
+            <tr><td><div style="font-weight:600">Akosua Frimpong</div><div style="font-size:.72rem;color:var(--muted)">akosua@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0809</code></td><td>Full Package</td><td><select class="stage-sel" onchange="updStage(this,'0809')"><option>Registration</option><option>Documents</option><option>Credential Eval</option><option>Board Application</option><option>NCLEX Coaching</option><option selected>Passed ✓</option></select></td><td><span class="badge b-success">Paid ✓</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div id="at-book" style="display:none">
+      <div class="admin-header"><div class="admin-page-title">Bookings</div><div class="admin-page-sub">All upcoming and recent sessions.</div></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Client</th><th>Session</th><th>Date & Time</th><th>Duration</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><div style="font-weight:600">Abena Mensah</div></td><td>Coaching Session</td><td>3 Jun 2025 · 10:00 AM</td><td>60 min</td><td><span class="badge b-success">Confirmed</span></td><td><button class="btn btn-sm btn-ghost">Reschedule</button></td></tr>
+            <tr><td><div style="font-weight:600">Kofi Asante</div></td><td>Free Discovery Call</td><td>4 Jun 2025 · 2:00 PM</td><td>30 min</td><td><span class="badge b-warn">Pending</span></td><td><button class="btn btn-sm btn-primary">Confirm</button></td></tr>
+            <tr><td><div style="font-weight:600">Efua Darko</div></td><td>Retaker Strategy</td><td>5 Jun 2025 · 4:00 PM</td><td>90 min</td><td><span class="badge b-success">Confirmed</span></td><td><button class="btn btn-sm btn-ghost">Reschedule</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div id="at-pay" style="display:none">
+      <div class="admin-header"><div class="admin-page-title">Payments</div><div class="admin-page-sub">Track revenue and outstanding balances.</div></div>
+      <div class="g3" style="margin-bottom:1.5rem">
+        <div class="stat-card"><div class="stat-val">GHS 14,250</div><div class="stat-label">Collected This Month</div></div>
+        <div class="stat-card gold"><div class="stat-val">GHS 4,890</div><div class="stat-label">Outstanding</div></div>
+        <div class="stat-card success"><div class="stat-val">23</div><div class="stat-label">Payments This Month</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Client</th><th>Reference</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><div style="font-weight:600">Akosua Frimpong</div></td><td><code style="font-size:.72rem;background:var(--pale);padding:.12rem .35rem;border-radius:4px">PAY-7721</code></td><td style="font-weight:700">GHS 2,500</td><td>MTN MoMo</td><td>28 May 2025</td><td><span class="badge b-success">Paid</span></td></tr>
+            <tr><td><div style="font-weight:600">Yaw Boateng</div></td><td><code style="font-size:.72rem;background:var(--pale);padding:.12rem .35rem;border-radius:4px">PAY-7718</code></td><td style="font-weight:700">GHS 1,500</td><td>Card</td><td>25 May 2025</td><td><span class="badge b-success">Paid</span></td></tr>
+            <tr><td><div style="font-weight:600">Abena Mensah</div></td><td><code style="font-size:.72rem;background:var(--pale);padding:.12rem .35rem;border-radius:4px">INV-001</code></td><td style="font-weight:700;color:var(--warn)">GHS 890</td><td>—</td><td>Due 14 Jun 2025</td><td><span class="badge b-warn">Outstanding</span></td></tr>
+            <tr><td><div style="font-weight:600">Kofi Asante</div></td><td><code style="font-size:.72rem;background:var(--pale);padding:.12rem .35rem;border-radius:4px">INV-002</code></td><td style="font-weight:700;color:var(--danger)">GHS 1,200</td><td>—</td><td>Overdue</td><td><span class="badge b-danger">Overdue</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── AUTH ──
+function switchAuthTab(t,el){
+  document.querySelectorAll('.auth-tab').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  ['login','register','admin'].forEach(x=>document.getElementById('f-'+x).style.display='none');
+  document.getElementById('f-'+t).style.display='block';
+  const titles={login:['Welcome back','Sign in to your account'],register:['Create account','Start your NCLEX journey'],admin:['Admin access','Restricted to authorised staff']};
+  document.getElementById('auth-title').textContent=titles[t][0];
+  document.getElementById('auth-sub').textContent=titles[t][1];
+}
+function doLogin(){
+  const e=document.getElementById('l-email').value;
+  const p=document.getElementById('l-pw').value;
+  if(e==='client@test.com'&&p==='pass123'){
+    document.getElementById('l-err').style.display='none';
+    showScreen('s-portal');
+  } else { document.getElementById('l-err').style.display='block'; }
+}
+function doRegister(){
+  showScreen('s-portal');
+}
+function doAdminLogin(){
+  const pw=document.getElementById('adm-pw').value;
+  if(pw==='admin123'){ document.getElementById('adm-err').style.display='none'; showScreen('s-admin'); }
+  else { document.getElementById('adm-err').style.display='block'; }
+}
+function logout(){ showScreen('s-auth'); }
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── PORTAL NAV ──
+const sectionMeta={
+  'pt-dash':['Dashboard','Welcome back, Abena'],
+  'pt-track':['My Journey','Track your 6-stage application pipeline'],
+  'pt-reg':['Application Form','Complete your NCLEX application'],
+  'pt-docs':['Documents','Upload and manage your documents'],
+  'pt-book':['Book a Session','Schedule time with Tilly'],
+  'pt-pay':['Payments','Pay securely online'],
+  'pt-qbank':['Question Bank','Practice NCLEX questions'],
+};
+function goSection(id,el){
+  document.querySelectorAll('.portal-section').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('on'));
+  if(el)el.classList.add('on');
+  const m=sectionMeta[id]||['Portal',''];
+  document.getElementById('tp-title').textContent=m[0];
+  document.getElementById('tp-sub').textContent=m[1];
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── PIPELINE ──
+const pipData=[
+  {t:'📋 Registration — Completed',d:'Your registration and all personal information have been received and verified.',m:'Completed 2 May 2025'},
+  {t:'📬 Documents Received — Completed',d:'Passport, NMC Licence, Transcripts, and Certificate confirmed. Birth certificate still pending.',m:'Completed 10 May 2025'},
+  {t:'🔍 Credential Evaluation — In Progress',d:'Documents submitted to Trumerit/CGFNS. This process takes 8–12 weeks. We monitor daily.',m:'Submitted 15 May 2025 · Ref: TRM-84729 · Est. Aug 2025'},
+  {t:'📝 Board Application — Pending',d:'Once credential evaluation is approved, we immediately file your Texas Board of Nursing application.',m:'Begins after credential evaluation'},
+  {t:'🎯 NCLEX Coaching — Pending',d:'Your 12-week personalised coaching programme begins after your ATT from Pearson VUE is received.',m:'Begins after board approval'},
+  {t:'🏆 Pass & Licensed — Pending',d:'Walk in confident. Walk out a US Registered Nurse. We will be with you every step of the way.',m:'Your finish line'},
+];
+function showPip(i){
+  const d=pipData[i];
+  ['pip-panel','pip-panel2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.querySelector('.dp-title').textContent=d.t;
+    el.querySelector('.dp-desc').textContent=d.d;
+    el.querySelector('.dp-meta').textContent=d.m;
+  });
+}
+
+// ── CALENDAR ──
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+let calMo=5,calYr=2025,selDate=null;
+function renderCal(){
+  document.getElementById('cal-lbl').textContent=MONTHS[calMo]+' '+calYr;
+  const g=document.getElementById('cal-grid');
+  g.innerHTML='';
+  ['Mo','Tu','We','Th','Fr','Sa','Su'].forEach(d=>{const h=document.createElement('div');h.className='cal-hd';h.textContent=d;g.appendChild(h);});
+  const first=new Date(calYr,calMo,1).getDay();
+  const off=first===0?6:first-1;
+  const days=new Date(calYr,calMo+1,0).getDate();
+  for(let i=0;i<off;i++){const e=document.createElement('div');e.className='cal-day emp';g.appendChild(e);}
+  for(let d=1;d<=days;d++){
+    const e=document.createElement('div');
+    const dow=new Date(calYr,calMo,d).getDay();
+    e.className='cal-day'+(dow===0?' dis':' avail');
+    e.textContent=d;
+    if(dow!==0){
+      if(selDate===d)e.classList.add('sel');
+      e.onclick=()=>{selDate=d;document.querySelectorAll('.cal-day').forEach(c=>c.classList.remove('sel'));e.classList.add('sel');document.getElementById('b-date').textContent=d+' '+MONTHS[calMo]+' '+calYr;};
+    }
+    g.appendChild(e);
+  }
+}
+function chgMo(d){calMo+=d;if(calMo>11){calMo=0;calYr++;}if(calMo<0){calMo=11;calYr--;}selDate=null;renderCal();document.getElementById('b-date').textContent='Not selected';}
+renderCal();
+
+// ── BOOKING ──
+function selSess(el,name,price,dur){
+  document.querySelectorAll('.sess-card').forEach(c=>{c.classList.remove('sel');c.querySelector('.sess-check').textContent='';});
+  el.classList.add('sel');el.querySelector('.sess-check').textContent='✓';
+  document.getElementById('b-sess').textContent=name;
+  document.getElementById('b-price').textContent=price;
+  document.getElementById('b-dur').textContent=dur;
+}
+function selTime(el){
+  document.querySelectorAll('.ts').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('b-time').textContent=el.textContent;
+}
+function confirmBook(){
+  if(document.getElementById('b-date').textContent==='Not selected'||document.getElementById('b-time').textContent==='Not selected'){
+    showToast('Please select a date and time first');return;
+  }
+  document.getElementById('book-main').style.display='none';
+  document.getElementById('book-success').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── PAYMENTS ──
+function selPlan(el,name,amt){
+  document.querySelectorAll('.plan-item').forEach(p=>{p.classList.remove('sel');p.querySelector('.plan-chk').textContent='';});
+  el.classList.add('sel');el.querySelector('.plan-chk').textContent='✓';
+  document.getElementById('pay-item').textContent=name;
+  document.getElementById('pay-total').textContent='GHS '+amt.toLocaleString();
+}
+function swPM(tab,m){
+  document.querySelectorAll('.pm').forEach(t=>t.classList.remove('on'));tab.classList.add('on');
+  document.getElementById('pm-card').style.display=m==='card'?'block':'none';
+  document.getElementById('pm-momo').style.display=m==='momo'?'block':'none';
+  document.getElementById('pm-bank').style.display=m==='bank'?'block':'none';
+}
+function selMomo(el){document.querySelectorAll('.momo-net').forEach(n=>n.classList.remove('on'));el.classList.add('on');}
+function confirmPay(){
+  document.getElementById('pay-main').style.display='none';
+  document.getElementById('pay-success').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── REGISTRATION ──
+function rNext(n){
+  document.getElementById('rss'+n).classList.remove('on');
+  document.getElementById('rss'+(n+1)).classList.add('on');
+  document.getElementById('rs'+n).classList.remove('on');
+  document.getElementById('rs'+n).classList.add('done');
+  document.getElementById('rs'+(n+1)).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function rBack(n){
+  document.getElementById('rss'+n).classList.remove('on');
+  document.getElementById('rss'+(n-1)).classList.add('on');
+  document.getElementById('rs'+n).classList.remove('on');
+  document.getElementById('rs'+(n-1)).classList.remove('done');
+  document.getElementById('rs'+(n-1)).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function onFileUp(inp){
+  if(!inp.files[0])return;
+  const w=inp.closest('.file-drop');
+  w.querySelector('strong').textContent='✓ '+inp.files[0].name;
+  w.style.borderColor='var(--teal)';w.style.background='rgba(0,168,150,.05)';
+}
+function submitReg(){
+  document.getElementById('reg-form').style.display='none';
+  document.getElementById('reg-success').style.display='block';
+  const ref='NPS-2025-'+Math.floor(1000+Math.random()*9000);
+  document.getElementById('reg-ref').textContent=ref;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── ADMIN ──
+function adTab(el,id){
+  document.querySelectorAll('.admin-item').forEach(i=>i.classList.remove('on'));
+  el.classList.add('on');
+  ['at-dash','at-clients','at-book','at-pay'].forEach(s=>{const el2=document.getElementById(s);if(el2)el2.style.display='none';});
+  document.getElementById(id).style.display='block';
+}
+function updStage(sel,ref){
+  showToast('Updated NPS-'+ref+' → '+sel.value);
+}
+
+// ── TOAST ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>
