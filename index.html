@@ -450,6 +450,9 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
   .auth-left{display:none}
 }
 </style>
+<!-- Supabase & Paystack -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body>
 
@@ -804,7 +807,7 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
           </div>
         </div>
         <div class="card card-pad">
-          <div class="card-title">Uploaded Documents</div>
+          <div class="card-title">Uploaded Documents</div><div id="doc-uploaded-list">
           <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">📄</div><div><div class="doc-name">Passport_Biodata.pdf</div><div class="doc-meta">1.2 MB · Uploaded 8 May 2025</div></div></div><span class="badge b-success">✓ Verified</span></div>
           <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">📋</div><div><div class="doc-name">NMC_Licence_2024.pdf</div><div class="doc-meta">0.8 MB · Uploaded 8 May 2025</div></div></div><span class="badge b-success">✓ Verified</span></div>
           <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">🎓</div><div><div class="doc-name">BSc_Nursing_Certificate.pdf</div><div class="doc-meta">2.1 MB · Uploaded 9 May 2025</div></div></div><span class="badge b-success">✓ Verified</span></div>
@@ -930,7 +933,7 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
           <span class="success-icon">✅</span>
           <h2 class="success-title">Payment Confirmed</h2>
           <p class="success-sub">Your payment has been received. Tilly will reach out within <strong>2 hours</strong>.</p>
-          <div class="ref-box"><div class="ref-label">Receipt Number</div><div class="ref-code">PAY-2025-7731</div></div>
+          <div class="ref-box"><div class="ref-label">Receipt Number</div><div class="ref-code" id="pay-receipt">PAY-2025-7731</div></div>
           <button class="btn btn-primary" onclick="goSection('pt-track',document.querySelectorAll('.sb-item')[1])">View My Progress →</button>
         </div>
       </div>
@@ -1010,8 +1013,8 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Client</th><th>Reference</th><th>Package</th><th>Stage</th><th>Payment</th><th>Action</th></tr></thead>
-          <tbody>
+          <thead><tr><th>Client</th><th>Reference</th><th>Package</th><th>Stage</th><th>Role</th><th>Action</th></tr></thead>
+          <tbody id="clients-tbody">
             <tr><td><div style="font-weight:600">Abena Mensah</div><div style="font-size:.72rem;color:var(--muted)">abena@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0847</code></td><td>Full Package</td><td><select class="stage-sel" onchange="updStage(this,'0847')"><option>Registration</option><option>Documents</option><option selected>Credential Eval</option><option>Board Application</option><option>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-warn">GHS 890 due</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
             <tr><td><div style="font-weight:600">Kofi Asante</div><div style="font-size:.72rem;color:var(--muted)">kofi@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0851</code></td><td>Coaching Only</td><td><select class="stage-sel" onchange="updStage(this,'0851')"><option selected>Registration</option><option>Documents</option><option>Credential Eval</option><option>Board Application</option><option>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-danger">Unpaid</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
             <tr><td><div style="font-weight:600">Efua Darko</div><div style="font-size:.72rem;color:var(--muted)">efua@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0839</code></td><td>Retakers</td><td><select class="stage-sel" onchange="updStage(this,'0839')"><option>Registration</option><option>Documents</option><option>Credential Eval</option><option selected>Board Application</option><option>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-success">Paid ✓</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
@@ -1028,7 +1031,7 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
       <div class="tbl-wrap">
         <table>
           <thead><tr><th>Client</th><th>Session</th><th>Date & Time</th><th>Duration</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody>
+          <tbody id="clients-tbody">
             <tr><td><div style="font-weight:600">Abena Mensah</div></td><td>Coaching Session</td><td>3 Jun 2025 · 10:00 AM</td><td>60 min</td><td><span class="badge b-success">Confirmed</span></td><td><button class="btn btn-sm btn-ghost">Reschedule</button></td></tr>
             <tr><td><div style="font-weight:600">Kofi Asante</div></td><td>Free Discovery Call</td><td>4 Jun 2025 · 2:00 PM</td><td>30 min</td><td><span class="badge b-warn">Pending</span></td><td><button class="btn btn-sm btn-primary">Confirm</button></td></tr>
             <tr><td><div style="font-weight:600">Efua Darko</div></td><td>Retaker Strategy</td><td>5 Jun 2025 · 4:00 PM</td><td>90 min</td><td><span class="badge b-success">Confirmed</span></td><td><button class="btn btn-sm btn-ghost">Reschedule</button></td></tr>
@@ -1064,7 +1067,159 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
 <div class="toast" id="toast"></div>
 
 <script>
-// ── AUTH ──
+// ══════════════════════════════════════════════
+// SUPABASE CONFIG — paste your credentials here
+// ══════════════════════════════════════════════
+const SUPABASE_URL = 'https://qptapwdwfbjdzrqlcoqd.supabase.co
+const SUPABASE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdGFwd2R3ZmJqZHpycWxjb3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDM0NDIsImV4cCI6MjA5NzIxOTQ0Mn0.pGKkrSS8EnTE9VOoFe4ZTe13VOgJdO_fHSOu96bE3E4
+
+const PAYSTACK_KEY = 'YOUR_PAYSTACK_PUBLIC_KEY'; // starts with pk_live_ or pk_test_
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let currentUser  = null;
+let clientProfile= null;
+
+// ══════════════════════════════════════════════
+// SCREEN NAVIGATION
+// ══════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════════
+// AUTH — LOGIN
+// ══════════════════════════════════════════════
+async function doLogin(){
+  const email    = document.getElementById('l-email').value.trim();
+  const password = document.getElementById('l-pw').value;
+  const errEl    = document.getElementById('l-err');
+  if(!email||!password){ errEl.textContent='Please enter your email and password.'; errEl.style.display='block'; return; }
+
+  showToast('Signing in...');
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+  if(error){
+    errEl.textContent = 'Incorrect email or password. Please try again.';
+    errEl.style.display = 'block';
+  } else {
+    errEl.style.display = 'none';
+    currentUser = data.user;
+    await loadClientProfile(email);
+    showScreen('s-portal');
+    goSection('pt-dash', document.querySelector('.sb-item'));
+  }
+}
+
+// ══════════════════════════════════════════════
+// AUTH — REGISTER
+// ══════════════════════════════════════════════
+async function doRegister(){
+  const inputs   = document.querySelectorAll('#f-register input');
+  const selects  = document.querySelectorAll('#f-register select');
+  const firstName= inputs[0].value.trim();
+  const lastName = inputs[1].value.trim();
+  const email    = inputs[2].value.trim();
+  const whatsapp = inputs[3].value.trim();
+  const password = inputs[4].value;
+  const pkg      = selects[0].value;
+
+  if(!firstName||!lastName||!email||!whatsapp||!password||!pkg){
+    showToast('Please fill all required fields'); return;
+  }
+  showToast('Creating your account...');
+
+  // 1. Create Supabase auth account
+  const { data: authData, error: authError } = await db.auth.signUp({ email, password });
+  if(authError){ showToast('Registration failed: '+authError.message); return; }
+
+  // 2. Generate reference
+  const ref = 'NPS-'+new Date().getFullYear()+'-'+Math.floor(1000+Math.random()*9000);
+
+  // 3. Save client profile to database
+  const { error: dbError } = await db.from('clients').insert([{
+    email, first_name: firstName, last_name: lastName,
+    whatsapp, package: pkg, application_ref: ref,
+    stage: 1, role: 'client'
+  }]);
+
+  if(dbError){ showToast('Account created but profile save failed — contact Tilly'); console.error(dbError); }
+  else { showToast('Account created! Check your email to verify.'); }
+
+  currentUser = authData.user;
+  await loadClientProfile(email);
+  showScreen('s-portal');
+}
+
+// ══════════════════════════════════════════════
+// AUTH — ADMIN LOGIN
+// ══════════════════════════════════════════════
+async function doAdminLogin(){
+  const email    = document.querySelector('#f-admin input[type=email]').value.trim();
+  const password = document.getElementById('adm-pw').value;
+  const errEl    = document.getElementById('adm-err');
+
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+  if(error){ errEl.style.display='block'; return; }
+
+  // Verify admin role
+  const { data: profile } = await db.from('clients').select('role').eq('email', email).single();
+  if(!profile || profile.role !== 'admin'){
+    errEl.textContent = 'Access denied — not an admin account.';
+    errEl.style.display = 'block';
+    await db.auth.signOut();
+    return;
+  }
+  errEl.style.display = 'none';
+  showScreen('s-admin');
+  loadAdminDash();
+}
+
+// ══════════════════════════════════════════════
+// LOAD CLIENT PROFILE
+// ══════════════════════════════════════════════
+async function loadClientProfile(email){
+  const { data } = await db.from('clients').select('*').eq('email', email).single();
+  if(!data) return;
+  clientProfile = data;
+  const fullName = data.first_name + ' ' + data.last_name;
+  const initials = (data.first_name[0] + data.last_name[0]).toUpperCase();
+  document.getElementById('sb-name').textContent   = fullName;
+  document.getElementById('sb-ref').textContent    = data.application_ref || '—';
+  document.getElementById('sb-av').textContent     = initials;
+  document.getElementById('dash-name').textContent = data.first_name;
+  document.getElementById('dash-ref').textContent  = data.application_ref || '—';
+
+  // Update stage badge
+  const stageNames = ['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
+  const stageEl = document.querySelector('.sb-badge.gold');
+  if(stageEl) stageEl.textContent = data.stage+'/6';
+
+  // Update dashboard stat card stage
+  const stageValEl = document.querySelector('.stat-card .stat-val');
+  if(stageValEl) stageValEl.textContent = data.stage + ' / 6';
+  const stageSubEl = document.querySelector('.stat-card .stat-sub.warn');
+  if(stageSubEl) stageSubEl.textContent = stageNames[data.stage] || '';
+}
+
+// ══════════════════════════════════════════════
+// LOGOUT
+// ══════════════════════════════════════════════
+async function logout(){
+  await db.auth.signOut();
+  currentUser = null;
+  clientProfile = null;
+  showScreen('s-auth');
+}
+
+// ══════════════════════════════════════════════
+// AUTH TAB SWITCH
+// ══════════════════════════════════════════════
 function switchAuthTab(t,el){
   document.querySelectorAll('.auth-tab').forEach(x=>x.classList.remove('on'));
   el.classList.add('on');
@@ -1074,32 +1229,12 @@ function switchAuthTab(t,el){
   document.getElementById('auth-title').textContent=titles[t][0];
   document.getElementById('auth-sub').textContent=titles[t][1];
 }
-function doLogin(){
-  const e=document.getElementById('l-email').value;
-  const p=document.getElementById('l-pw').value;
-  if(e==='client@test.com'&&p==='pass123'){
-    document.getElementById('l-err').style.display='none';
-    showScreen('s-portal');
-  } else { document.getElementById('l-err').style.display='block'; }
-}
-function doRegister(){
-  showScreen('s-portal');
-}
-function doAdminLogin(){
-  const pw=document.getElementById('adm-pw').value;
-  if(pw==='admin123'){ document.getElementById('adm-err').style.display='none'; showScreen('s-admin'); }
-  else { document.getElementById('adm-err').style.display='block'; }
-}
-function logout(){ showScreen('s-auth'); }
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
 
-// ── PORTAL NAV ──
+// ══════════════════════════════════════════════
+// PORTAL NAVIGATION
+// ══════════════════════════════════════════════
 const sectionMeta={
-  'pt-dash':['Dashboard','Welcome back, Abena'],
+  'pt-dash':['Dashboard','Welcome back'],
   'pt-track':['My Journey','Track your 6-stage application pipeline'],
   'pt-reg':['Application Form','Complete your NCLEX application'],
   'pt-docs':['Documents','Upload and manage your documents'],
@@ -1111,21 +1246,26 @@ function goSection(id,el){
   document.querySelectorAll('.portal-section').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('on'));
-  if(el)el.classList.add('on');
+  if(el) el.classList.add('on');
   const m=sectionMeta[id]||['Portal',''];
   document.getElementById('tp-title').textContent=m[0];
   document.getElementById('tp-sub').textContent=m[1];
   window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='pt-docs') loadDocuments();
+  if(id==='pt-pay')  loadPaymentHistory();
+  if(id==='pt-book') loadBookings();
 }
 
-// ── PIPELINE ──
+// ══════════════════════════════════════════════
+// PIPELINE
+// ══════════════════════════════════════════════
 const pipData=[
-  {t:'📋 Registration — Completed',d:'Your registration and all personal information have been received and verified.',m:'Completed 2 May 2025'},
-  {t:'📬 Documents Received — Completed',d:'Passport, NMC Licence, Transcripts, and Certificate confirmed. Birth certificate still pending.',m:'Completed 10 May 2025'},
-  {t:'🔍 Credential Evaluation — In Progress',d:'Documents submitted to Trumerit/CGFNS. This process takes 8–12 weeks. We monitor daily.',m:'Submitted 15 May 2025 · Ref: TRM-84729 · Est. Aug 2025'},
-  {t:'📝 Board Application — Pending',d:'Once credential evaluation is approved, we immediately file your Texas Board of Nursing application.',m:'Begins after credential evaluation'},
-  {t:'🎯 NCLEX Coaching — Pending',d:'Your 12-week personalised coaching programme begins after your ATT from Pearson VUE is received.',m:'Begins after board approval'},
-  {t:'🏆 Pass & Licensed — Pending',d:'Walk in confident. Walk out a US Registered Nurse. We will be with you every step of the way.',m:'Your finish line'},
+  {t:'Registration — Completed',d:'Your registration and all personal information have been received and verified.',m:''},
+  {t:'Documents Received — Completed',d:'Your documents have been reviewed and confirmed. Any missing items are flagged above.',m:''},
+  {t:'Credential Evaluation — In Progress',d:'Documents submitted to Trumerit/CGFNS. This process takes 8–12 weeks. We monitor daily and notify you of every update.',m:''},
+  {t:'Board Application — Pending',d:'Once credential evaluation is approved, we immediately file your state board application. No action needed from you.',m:''},
+  {t:'NCLEX Coaching — Pending',d:'Your 12-week personalised coaching programme begins after your ATT from Pearson VUE is received.',m:''},
+  {t:'Pass & Licensed — Pending',d:'You have got this. Walk in confident, walk out a US Registered Nurse. We will be with you every step.',m:''},
 ];
 function showPip(i){
   const d=pipData[i];
@@ -1138,7 +1278,9 @@ function showPip(i){
   });
 }
 
-// ── CALENDAR ──
+// ══════════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════════
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 let calMo=5,calYr=2025,selDate=null;
 function renderCal(){
@@ -1165,7 +1307,9 @@ function renderCal(){
 function chgMo(d){calMo+=d;if(calMo>11){calMo=0;calYr++;}if(calMo<0){calMo=11;calYr--;}selDate=null;renderCal();document.getElementById('b-date').textContent='Not selected';}
 renderCal();
 
-// ── BOOKING ──
+// ══════════════════════════════════════════════
+// BOOKING
+// ══════════════════════════════════════════════
 function selSess(el,name,price,dur){
   document.querySelectorAll('.sess-card').forEach(c=>{c.classList.remove('sel');c.querySelector('.sess-check').textContent='';});
   el.classList.add('sel');el.querySelector('.sess-check').textContent='✓';
@@ -1178,16 +1322,38 @@ function selTime(el){
   el.classList.add('sel');
   document.getElementById('b-time').textContent=el.textContent;
 }
-function confirmBook(){
-  if(document.getElementById('b-date').textContent==='Not selected'||document.getElementById('b-time').textContent==='Not selected'){
-    showToast('Please select a date and time first');return;
-  }
+
+async function confirmBook(){
+  const date=document.getElementById('b-date').textContent;
+  const time=document.getElementById('b-time').textContent;
+  if(date==='Not selected'||time==='Not selected'){ showToast('Please select a date and time first'); return; }
+
+  showToast('Saving booking...');
+  const ref = clientProfile ? clientProfile.application_ref : 'UNKNOWN';
+
+  const { error } = await db.from('bookings').insert([{
+    client_ref:   ref,
+    session_type: document.getElementById('b-sess').textContent,
+    date,
+    time,
+    status: 'pending'
+  }]);
+
+  if(error){ showToast('Booking failed — please try again'); console.error(error); return; }
+
   document.getElementById('book-main').style.display='none';
   document.getElementById('book-success').style.display='block';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ── PAYMENTS ──
+async function loadBookings(){
+  if(!clientProfile) return;
+  // Booking history could be loaded here and shown in a table
+}
+
+// ══════════════════════════════════════════════
+// PAYMENTS — PAYSTACK
+// ══════════════════════════════════════════════
 function selPlan(el,name,amt){
   document.querySelectorAll('.plan-item').forEach(p=>{p.classList.remove('sel');p.querySelector('.plan-chk').textContent='';});
   el.classList.add('sel');el.querySelector('.plan-chk').textContent='✓';
@@ -1200,14 +1366,58 @@ function swPM(tab,m){
   document.getElementById('pm-momo').style.display=m==='momo'?'block':'none';
   document.getElementById('pm-bank').style.display=m==='bank'?'block':'none';
 }
-function selMomo(el){document.querySelectorAll('.momo-net').forEach(n=>n.classList.remove('on'));el.classList.add('on');}
+function selMomo(el){ document.querySelectorAll('.momo-net').forEach(n=>n.classList.remove('on')); el.classList.add('on'); }
+
 function confirmPay(){
-  document.getElementById('pay-main').style.display='none';
-  document.getElementById('pay-success').style.display='block';
-  window.scrollTo({top:0,behavior:'smooth'});
+  const totalText = document.getElementById('pay-total').textContent;
+  const amount    = parseInt(totalText.replace('GHS ','').replace(',','').trim()) || 0;
+  const email     = currentUser ? currentUser.email : 'client@nclexpro.com';
+  const ref       = 'PAY-'+new Date().getFullYear()+'-'+Math.floor(1000+Math.random()*9000);
+
+  if(!window.PaystackPop){
+    showToast('Paystack not loaded — check your internet connection');
+    return;
+  }
+
+  const handler = PaystackPop.setup({
+    key:      PAYSTACK_KEY,
+    email,
+    amount:   amount * 100, // convert GHS to pesewas
+    currency: 'GHS',
+    ref,
+    label:    'NCLEX Pro Solutions',
+    metadata: {
+      client_ref: clientProfile ? clientProfile.application_ref : '',
+      item:       document.getElementById('pay-item').textContent,
+    },
+    onClose: function(){ showToast('Payment window closed'); },
+    callback: async function(response){
+      showToast('Payment confirmed — saving receipt...');
+
+      // Save payment record to Supabase
+      await db.from('payments').insert([{
+        client_ref:   clientProfile ? clientProfile.application_ref : '',
+        amount,
+        currency:     'GHS',
+        method:       'Paystack',
+        status:       'paid',
+        paystack_ref: response.reference,
+      }]);
+
+      document.getElementById('pay-main').style.display='none';
+      document.getElementById('pay-success').style.display='block';
+      document.getElementById('pay-receipt').textContent = response.reference;
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+  });
+  handler.openIframe();
 }
 
-// ── REGISTRATION ──
+async function loadPaymentHistory(){ /* Can load and display payment records here */ }
+
+// ══════════════════════════════════════════════
+// REGISTRATION FORM
+// ══════════════════════════════════════════════
 function rNext(n){
   document.getElementById('rss'+n).classList.remove('on');
   document.getElementById('rss'+(n+1)).classList.add('on');
@@ -1224,37 +1434,214 @@ function rBack(n){
   document.getElementById('rs'+(n-1)).classList.add('on');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function onFileUp(inp){
-  if(!inp.files[0])return;
-  const w=inp.closest('.file-drop');
-  w.querySelector('strong').textContent='✓ '+inp.files[0].name;
-  w.style.borderColor='var(--teal)';w.style.background='rgba(0,168,150,.05)';
-}
-function submitReg(){
-  document.getElementById('reg-form').style.display='none';
-  document.getElementById('reg-success').style.display='block';
-  const ref='NPS-2025-'+Math.floor(1000+Math.random()*9000);
-  document.getElementById('reg-ref').textContent=ref;
+
+async function submitReg(){
+  if(!clientProfile){ showToast('Please log in first'); return; }
+  showToast('Saving your application...');
+
+  // Collect key fields from Step 3
+  const step3Selects = document.querySelectorAll('#rss3 select');
+  const targetCountry = step3Selects[0] ? step3Selects[0].value : '';
+
+  const { error } = await db.from('clients')
+    .update({ stage: 2, target_country: targetCountry })
+    .eq('application_ref', clientProfile.application_ref);
+
+  if(error){ showToast('Save failed — please try again'); return; }
+
+  const ref = clientProfile.application_ref || 'NPS-'+new Date().getFullYear()+'-'+Math.floor(1000+Math.random()*9000);
+  document.getElementById('reg-form').style.display  = 'none';
+  document.getElementById('reg-success').style.display = 'block';
+  document.getElementById('reg-ref').textContent = ref;
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ── ADMIN ──
+// ══════════════════════════════════════════════
+// FILE UPLOAD — SUPABASE STORAGE
+// ══════════════════════════════════════════════
+async function onFileUp(inp){
+  if(!inp.files[0]) return;
+  const file = inp.files[0];
+
+  // Validate file type and size
+  const allowed = ['application/pdf','image/jpeg','image/png'];
+  if(!allowed.includes(file.type)){ showToast('Only PDF, JPG, or PNG files allowed'); return; }
+  if(file.size > 5 * 1024 * 1024){ showToast('File must be under 5MB'); return; }
+
+  const ref  = clientProfile ? clientProfile.application_ref : 'unknown';
+  const path = ref+'/'+Date.now()+'_'+file.name.replace(/\s+/g,'_');
+
+  showToast('Uploading '+file.name+'...');
+
+  const { data, error } = await db.storage.from('documents').upload(path, file);
+
+  if(error){
+    showToast('Upload failed — please try again');
+    console.error(error);
+    return;
+  }
+
+  // Save document record
+  await db.from('documents').insert([{
+    client_ref: ref,
+    doc_type:   'general',
+    file_url:   path,
+    status:     'submitted'
+  }]);
+
+  // Update UI
+  const w = inp.closest('.file-drop');
+  w.querySelector('strong').textContent = '✓ '+file.name;
+  w.style.borderColor = 'var(--teal)';
+  w.style.background  = 'rgba(0,168,150,.05)';
+  showToast('✓ '+file.name+' uploaded successfully');
+
+  if(document.getElementById('pt-docs').classList.contains('on')) loadDocuments();
+}
+
+async function loadDocuments(){
+  if(!clientProfile) return;
+  const { data, error } = await db.from('documents')
+    .select('*')
+    .eq('client_ref', clientProfile.application_ref)
+    .order('created_at', { ascending: false });
+
+  if(error||!data||!data.length) return;
+
+  const list = document.getElementById('doc-uploaded-list');
+  if(!list) return;
+
+  list.innerHTML = data.map(doc => `
+    <div class="doc-item">
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <div class="doc-icon">📄</div>
+        <div>
+          <div class="doc-name">${doc.file_url.split('/').pop()}</div>
+          <div class="doc-meta">${doc.doc_type} · ${new Date(doc.created_at).toLocaleDateString()}</div>
+        </div>
+      </div>
+      <span class="badge ${doc.status==='verified'?'b-success':doc.status==='submitted'?'b-teal':'b-warn'}">
+        ${doc.status==='verified'?'✓ Verified':doc.status==='submitted'?'Submitted':'Pending'}
+      </span>
+    </div>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════
 function adTab(el,id){
   document.querySelectorAll('.admin-item').forEach(i=>i.classList.remove('on'));
   el.classList.add('on');
-  ['at-dash','at-clients','at-book','at-pay'].forEach(s=>{const el2=document.getElementById(s);if(el2)el2.style.display='none';});
+  ['at-dash','at-clients','at-book','at-pay'].forEach(s=>{const e=document.getElementById(s);if(e)e.style.display='none';});
   document.getElementById(id).style.display='block';
-}
-function updStage(sel,ref){
-  showToast('Updated NPS-'+ref+' → '+sel.value);
+  if(id==='at-clients') loadAdminClients();
+  if(id==='at-book')    loadAdminBookings();
+  if(id==='at-pay')     loadAdminPayments();
 }
 
-// ── TOAST ──
+async function loadAdminDash(){
+  const { data: clients } = await db.from('clients').select('id', { count: 'exact' });
+  const countEl = document.querySelector('#at-dash .stat-val');
+  if(countEl && clients) countEl.textContent = clients.length;
+}
+
+async function loadAdminClients(){
+  const { data } = await db.from('clients').select('*').order('created_at', { ascending: false });
+  if(!data) return;
+  const tbody = document.getElementById('clients-tbody');
+  if(!tbody) return;
+  const stages = ['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td><div style="font-weight:600">${c.first_name} ${c.last_name}</div><div style="font-size:.72rem;color:var(--muted)">${c.email}</div></td>
+      <td><code style="font-size:.72rem;background:var(--pale);padding:.12rem .35rem;border-radius:4px">${c.application_ref||'—'}</code></td>
+      <td>${c.package||'—'}</td>
+      <td>
+        <select class="stage-sel" onchange="updStage(this,'${c.application_ref}')">
+          ${stages.map((s,i)=>i===0?'':`<option value="${i}" ${c.stage===i?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td><span class="badge b-navy">${c.role||'client'}</span></td>
+      <td><button class="btn btn-sm btn-ghost">View</button></td>
+    </tr>`
+  ).join('');
+}
+
+async function loadAdminBookings(){
+  const { data } = await db.from('bookings').select('*').order('created_at', { ascending: false });
+  if(!data) return;
+  const tbody = document.querySelector('#at-book tbody');
+  if(!tbody) return;
+  tbody.innerHTML = data.map(b => `
+    <tr>
+      <td><div style="font-weight:600">${b.client_ref}</div></td>
+      <td>${b.session_type}</td>
+      <td>${b.date} · ${b.time}</td>
+      <td><span class="badge ${b.status==='confirmed'?'b-success':b.status==='pending'?'b-warn':'b-navy'}">${b.status}</span></td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="confirmBooking('${b.id}')">Confirm</button>
+        <button class="btn btn-sm btn-ghost" style="margin-left:.4rem">Reschedule</button>
+      </td>
+    </tr>`
+  ).join('');
+}
+
+async function confirmBooking(id){
+  await db.from('bookings').update({ status: 'confirmed' }).eq('id', id);
+  showToast('Booking confirmed ✓');
+  loadAdminBookings();
+}
+
+async function loadAdminPayments(){
+  const { data } = await db.from('payments').select('*').order('created_at', { ascending: false });
+  if(!data) return;
+  const tbody = document.querySelector('#at-pay tbody');
+  if(!tbody) return;
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td><div style="font-weight:600">${p.client_ref}</div></td>
+      <td><code style="font-size:.72rem;background:var(--pale);padding:.12rem .35rem;border-radius:4px">${p.paystack_ref||'—'}</code></td>
+      <td style="font-weight:700">${p.currency} ${(p.amount||0).toLocaleString()}</td>
+      <td>${p.method||'—'}</td>
+      <td>${new Date(p.created_at).toLocaleDateString()}</td>
+      <td><span class="badge ${p.status==='paid'?'b-success':'b-warn'}">${p.status}</span></td>
+    </tr>`
+  ).join('');
+}
+
+async function updStage(sel, ref){
+  const { error } = await db.from('clients').update({ stage: parseInt(sel.value) }).eq('application_ref', ref);
+  if(error){ showToast('Update failed'); console.error(error); }
+  else {
+    const labels=['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
+    showToast('✓ '+ref+' updated to: '+labels[sel.value]);
+  }
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
 function showToast(msg){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.style.display='block';
-  setTimeout(()=>t.style.display='none',3000);
+  t.textContent=msg; t.style.display='block';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.style.display='none',3500);
 }
+
+// ══════════════════════════════════════════════
+// INIT — check if already logged in
+// ══════════════════════════════════════════════
+(async function init(){
+  const { data: { session } } = await db.auth.getSession();
+  if(session){
+    currentUser = session.user;
+    await loadClientProfile(session.user.email);
+    // Check if admin
+    if(clientProfile && clientProfile.role === 'admin'){ showScreen('s-admin'); loadAdminDash(); }
+    else { showScreen('s-portal'); }
+  }
+})();
 </script>
 </body>
 </html>
