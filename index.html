@@ -95,6 +95,7 @@ body{font-family:'Inter',sans-serif;background:var(--off);color:var(--ink);min-h
 
 /* Form elements */
 .fg{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.9rem}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important}
 .fg label{font-size:.75rem;font-weight:600;color:var(--mid);letter-spacing:.02em}
 .fg label .req{color:var(--teal)}
 .fg input,.fg select{
@@ -491,24 +492,34 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
       <div id="f-login">
         <div class="fg"><label>Email address <span class="req">*</span></label><input type="email" id="l-email" placeholder="your@email.com"/></div>
         <div class="fg"><label>Password <span class="req">*</span></label><input type="password" id="l-pw" placeholder="Your password"/></div>
-        <div class="err" id="l-err" style="display:none;margin-bottom:.75rem">Incorrect credentials. Demo: client@test.com / pass123</div>
+        <div class="err" id="l-err" style="display:none;margin-bottom:.75rem">Incorrect email or password. Please try again.</div>
         <button class="btn btn-primary btn-block btn-lg" style="margin-top:.25rem" onclick="doLogin()">Sign In →</button>
-        <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:1rem">Demo: <strong>client@test.com</strong> / <strong>pass123</strong></p>
       </div>
 
       <!-- REGISTER -->
       <div id="f-register" style="display:none">
         <div class="fg-row">
-          <div class="fg"><label>First name <span class="req">*</span></label><input type="text" placeholder="Abena"/></div>
-          <div class="fg"><label>Last name <span class="req">*</span></label><input type="text" placeholder="Mensah"/></div>
+          <div class="fg"><label>First name <span class="req">*</span></label><input type="text" id="reg-first" placeholder="Abena"/></div>
+          <div class="fg"><label>Last name <span class="req">*</span></label><input type="text" id="reg-last" placeholder="Mensah"/></div>
         </div>
-        <div class="fg"><label>Email address <span class="req">*</span></label><input type="email" placeholder="your@email.com"/></div>
-        <div class="fg"><label>WhatsApp number <span class="req">*</span></label><input type="tel" placeholder="+233 XX XXX XXXX"/></div>
-        <div class="fg"><label>Password <span class="req">*</span></label><input type="password" placeholder="Minimum 8 characters"/></div>
-        <div class="fg"><label>Service package <span class="req">*</span></label>
-          <select><option value="">Select a package</option><option>Full Package (Registration + Coaching)</option><option>NCLEX Coaching Only</option><option>Retakers Intensive Programme</option><option>Credential Evaluation Only</option></select>
+        <div class="fg"><label>Email address <span class="req">*</span></label><input type="email" id="reg-email" placeholder="your@email.com"/></div>
+        <div class="fg"><label>WhatsApp number <span class="req">*</span></label><input type="tel" id="reg-wa" placeholder="+233 XX XXX XXXX"/></div>
+        <div class="err" id="reg-err" style="display:none;margin-bottom:.75rem"></div>
+        <button class="btn btn-primary btn-block btn-lg" style="margin-top:.25rem" id="reg-btn" onclick="doRegister()">Create Account →</button>
+        <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:1rem;line-height:1.6">A temporary password and your login details will be sent to your email after registration.</p>
+      </div>
+
+      <!-- REGISTER SUCCESS -->
+      <div id="f-reg-success" style="display:none;text-align:center;padding:1rem 0">
+        <div style="font-size:2.5rem;margin-bottom:.75rem">📧</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Check Your Email</div>
+        <p style="color:var(--muted);font-size:.84rem;line-height:1.7;margin-bottom:1.25rem">Your account has been created. We have sent your <strong>login details and a confirmation link</strong> to your email address. Please check your inbox and confirm your email before logging in.</p>
+        <div style="background:var(--pale);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:1.25rem;font-size:.8rem;color:var(--mid);text-align:left;line-height:1.8">
+          <strong style="color:var(--ink)">Your reference number:</strong><br>
+          <span id="new-ref" style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--teal)">NPS-2025-—</span>
         </div>
-        <button class="btn btn-primary btn-block btn-lg" style="margin-top:.25rem" onclick="doRegister()">Create Account →</button>
+        <p style="font-size:.75rem;color:var(--faint);margin-bottom:1rem">Can't find the email? Check your spam folder.</p>
+        <button class="btn btn-ghost btn-block" onclick="switchAuthTab('login',document.querySelectorAll('.auth-tab')[0])">Go to Sign In →</button>
       </div>
 
       <!-- ADMIN -->
@@ -516,9 +527,8 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
         <div class="alert alert-warn" style="margin-bottom:1rem">⚠️ Restricted access — authorised personnel only</div>
         <div class="fg"><label>Admin email</label><input type="email" placeholder="admin@nclexprosolutions.com"/></div>
         <div class="fg"><label>Admin password</label><input type="password" placeholder="Admin password" id="adm-pw"/></div>
-        <div class="err" id="adm-err" style="display:none;margin-bottom:.75rem">Invalid. Demo: admin@nclex.com / admin123</div>
+        <div class="err" id="adm-err" style="display:none;margin-bottom:.75rem">Invalid credentials. Please contact your administrator.</div>
         <button class="btn btn-navy btn-block btn-lg" style="margin-top:.25rem" onclick="doAdminLogin()">Admin Sign In →</button>
-        <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:1rem">Demo: <strong>admin@nclex.com</strong> / <strong>admin123</strong></p>
       </div>
     </div>
   </div>
@@ -815,6 +825,7 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
           <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">📄</div><div><div class="doc-name">Official_Transcripts.pdf</div><div class="doc-meta">3.4 MB · Uploaded 9 May 2025</div></div></div><span class="badge b-teal">Under Review</span></div>
         </div>
       </div>
+      </div><!-- close pt-docs portal-section -->
 
       <!-- ── BOOKING ── -->
       <div class="portal-section" id="pt-book">
@@ -1119,41 +1130,198 @@ async function doLogin(){
 // ══════════════════════════════════════════════
 // AUTH — REGISTER
 // ══════════════════════════════════════════════
-async function doRegister(){
-  const inputs   = document.querySelectorAll('#f-register input');
-  const selects  = document.querySelectorAll('#f-register select');
-  const firstName= inputs[0].value.trim();
-  const lastName = inputs[1].value.trim();
-  const email    = inputs[2].value.trim();
-  const whatsapp = inputs[3].value.trim();
-  const password = inputs[4].value;
-  const pkg      = selects[0].value;
+// ══════════════════════════════════════════════
+// RESEND CONFIG — paste your Resend API key here
+// ══════════════════════════════════════════════
+const RESEND_KEY = 're_J6F8xrqh_N8QkfbFfnJNGAxpVyZ2YQBdR’;
 
-  if(!firstName||!lastName||!email||!whatsapp||!password||!pkg){
-    showToast('Please fill all required fields'); return;
+async function sendWelcomeEmail(to, firstName, ref, tempPwd) {
+  // Calls Resend API to send a branded welcome email with login details
+  try {
+    const portalUrl = window.location.origin + window.location.pathname;
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + RESEND_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'NCLEX Pro Solutions <noreply@nclexprosolutions.com>',
+        to: [to],
+        subject: 'Welcome to NCLEX Pro Solutions — Your Login Details',
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head><meta charset="UTF-8"/></head>
+          <body style="margin:0;padding:0;background:#f8f9fb;font-family:Arial,sans-serif">
+            <div style="max-width:580px;margin:40px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)">
+
+              <!-- Header -->
+              <div style="background:#07192f;padding:32px 40px;text-align:center">
+                <div style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-.02em">
+                  NCLEX <span style="color:#00c9b5">Pro</span> Solutions
+                </div>
+                <div style="color:rgba(255,255,255,.4);font-size:12px;margin-top:4px;text-transform:uppercase;letter-spacing:.08em">Client Portal</div>
+              </div>
+
+              <!-- Body -->
+              <div style="padding:40px">
+                <h2 style="margin:0 0 8px;font-size:22px;color:#0d1b2a">Welcome, ${firstName}! 🎉</h2>
+                <p style="color:#6b7f96;font-size:15px;line-height:1.65;margin:0 0 28px">
+                  Your NCLEX Pro Solutions account has been created. Here are your login details — please keep them safe.
+                </p>
+
+                <!-- Login Details Box -->
+                <div style="background:#eef1f6;border-radius:10px;padding:24px;margin-bottom:28px">
+                  <div style="font-size:11px;font-weight:700;color:#6b7f96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px">Your Login Details</div>
+                  <table style="width:100%;border-collapse:collapse">
+                    <tr>
+                      <td style="font-size:13px;color:#6b7f96;padding:6px 0;width:40%">Portal URL</td>
+                      <td style="font-size:13px;font-weight:600;color:#0d1b2a;padding:6px 0">
+                        <a href="${portalUrl}" style="color:#00a896">${portalUrl}</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:13px;color:#6b7f96;padding:6px 0">Email</td>
+                      <td style="font-size:13px;font-weight:600;color:#0d1b2a;padding:6px 0">${to}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:13px;color:#6b7f96;padding:6px 0">Password</td>
+                      <td style="font-size:15px;font-weight:700;color:#07192f;padding:6px 0;font-family:monospace;letter-spacing:.05em">${tempPwd}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:13px;color:#6b7f96;padding:6px 0">Reference No.</td>
+                      <td style="font-size:15px;font-weight:700;color:#00a896;padding:6px 0;font-family:monospace">${ref}</td>
+                    </tr>
+                  </table>
+                </div>
+
+                <!-- CTA Button -->
+                <div style="text-align:center;margin-bottom:28px">
+                  <a href="${portalUrl}" style="display:inline-block;background:#00a896;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:50px;box-shadow:0 4px 16px rgba(0,168,150,.3)">
+                    Log In to Your Portal →
+                  </a>
+                </div>
+
+                <!-- Next Steps -->
+                <div style="border-left:3px solid #00a896;padding-left:16px;margin-bottom:28px">
+                  <div style="font-size:13px;font-weight:700;color:#0d1b2a;margin-bottom:10px">Next Steps After Logging In</div>
+                  <ol style="margin:0;padding-left:18px;color:#6b7f96;font-size:13px;line-height:2">
+                    <li>Complete your <strong style="color:#0d1b2a">Application Form</strong> — personal info, nursing background, and target country</li>
+                    <li>Upload your <strong style="color:#0d1b2a">Documents</strong> — passport, NMC licence, certificates, transcripts</li>
+                    <li>Book your <strong style="color:#0d1b2a">Free Discovery Call</strong> with Tilly</li>
+                  </ol>
+                </div>
+
+                <!-- Password change note -->
+                <div style="background:#fffbeb;border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:14px 16px;margin-bottom:28px">
+                  <p style="margin:0;font-size:13px;color:#b45309;line-height:1.6">
+                    <strong>Security tip:</strong> After your first login, go to your profile settings and change your password to something memorable.
+                  </p>
+                </div>
+
+                <p style="color:#6b7f96;font-size:13px;line-height:1.65;margin:0">
+                  Questions? WhatsApp Tilly directly at
+                  <a href="https://wa.me/233504299230" style="color:#00a896;font-weight:600">+233 50 429 9230</a>
+                </p>
+              </div>
+
+              <!-- Footer -->
+              <div style="background:#f8f9fb;border-top:1px solid #eef1f6;padding:24px 40px;text-align:center">
+                <p style="margin:0;font-size:12px;color:#a8b8cc;line-height:1.6">
+                  NCLEX Pro Solutions &nbsp;·&nbsp; info@nclexprosolutions.com<br>
+                  Accra, Ghana &nbsp;·&nbsp; Serving nurses across Africa and the diaspora
+                </p>
+              </div>
+
+            </div>
+          </body>
+          </html>
+        `
+      })
+    });
+
+    if(!res.ok){
+      const err = await res.json();
+      console.error('Resend error:', err);
+      return false;
+    }
+    return true;
+  } catch(err) {
+    console.error('Email send failed:', err);
+    return false;
   }
-  showToast('Creating your account...');
+}
+
+async function doRegister(){
+  const firstName = document.getElementById('reg-first').value.trim();
+  const lastName  = document.getElementById('reg-last').value.trim();
+  const email     = document.getElementById('reg-email').value.trim();
+  const whatsapp  = document.getElementById('reg-wa').value.trim();
+  const errEl     = document.getElementById('reg-err');
+  const btn       = document.getElementById('reg-btn');
+
+  // Validate
+  if(!firstName){ errEl.textContent='Please enter your first name.'; errEl.style.display='block'; return; }
+  if(!lastName){  errEl.textContent='Please enter your last name.';  errEl.style.display='block'; return; }
+  if(!email || !email.includes('@')){ errEl.textContent='Please enter a valid email address.'; errEl.style.display='block'; return; }
+  if(!whatsapp){  errEl.textContent='Please enter your WhatsApp number.'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  // Generate reference and temporary password
+  const ref     = 'NPS-'+new Date().getFullYear()+'-'+Math.floor(1000+Math.random()*9000);
+  const tempPwd = 'NCLEX-'+Math.random().toString(36).substring(2,8).toUpperCase();
+
+  btn.textContent = 'Creating account...';
+  btn.disabled = true;
 
   // 1. Create Supabase auth account
-  const { data: authData, error: authError } = await db.auth.signUp({ email, password });
-  if(authError){ showToast('Registration failed: '+authError.message); return; }
+  const { data: authData, error: authError } = await db.auth.signUp({
+    email,
+    password: tempPwd,
+    options: {
+      data: { first_name: firstName, last_name: lastName },
+      emailRedirectTo: window.location.origin + window.location.pathname,
+    }
+  });
 
-  // 2. Generate reference
-  const ref = 'NPS-'+new Date().getFullYear()+'-'+Math.floor(1000+Math.random()*9000);
+  if(authError){
+    errEl.textContent = authError.message.includes('already registered')
+      ? 'This email is already registered. Please sign in instead.'
+      : 'Registration failed: ' + authError.message;
+    errEl.style.display='block';
+    btn.textContent = 'Create Account →';
+    btn.disabled = false;
+    return;
+  }
 
-  // 3. Save client profile to database
+  // 2. Save client profile to Supabase
   const { error: dbError } = await db.from('clients').insert([{
-    email, first_name: firstName, last_name: lastName,
-    whatsapp, package: pkg, application_ref: ref,
-    stage: 1, role: 'client'
+    email,
+    first_name:      firstName,
+    last_name:       lastName,
+    whatsapp,
+    application_ref: ref,
+    stage:           1,
+    role:            'client'
   }]);
 
-  if(dbError){ showToast('Account created but profile save failed — contact Tilly'); console.error(dbError); }
-  else { showToast('Account created! Check your email to verify.'); }
+  if(dbError) console.error('Profile save error:', dbError);
 
-  currentUser = authData.user;
-  await loadClientProfile(email);
-  showScreen('s-portal');
+  // 3. Send welcome email with login details via Resend
+  const emailSent = await sendWelcomeEmail(email, firstName, ref, tempPwd);
+
+  // 4. Show success screen
+  document.getElementById('new-ref').textContent         = ref;
+  document.getElementById('f-register').style.display    = 'none';
+  document.getElementById('f-reg-success').style.display = 'block';
+  document.getElementById('auth-title').textContent      = 'Account Created!';
+  document.getElementById('auth-sub').textContent        = emailSent
+    ? 'Login details sent to ' + email
+    : 'Account created — check your email to log in';
+
+  btn.textContent = 'Create Account →';
+  btn.disabled = false;
 }
 
 // ══════════════════════════════════════════════
@@ -1278,12 +1446,20 @@ async function logout(){
 // ══════════════════════════════════════════════
 function switchAuthTab(t,el){
   document.querySelectorAll('.auth-tab').forEach(x=>x.classList.remove('on'));
-  el.classList.add('on');
-  ['login','register','admin'].forEach(x=>document.getElementById('f-'+x).style.display='none');
+  if(el) el.classList.add('on');
+  // Hide all auth panels including success screen
+  ['login','register','admin','reg-success'].forEach(x=>{
+    const e=document.getElementById('f-'+x);
+    if(e) e.style.display='none';
+  });
   document.getElementById('f-'+t).style.display='block';
-  const titles={login:['Welcome back','Sign in to your account'],register:['Create account','Start your NCLEX journey'],admin:['Admin access','Restricted to authorised staff']};
-  document.getElementById('auth-title').textContent=titles[t][0];
-  document.getElementById('auth-sub').textContent=titles[t][1];
+  const titles={
+    login:   ['Welcome back',    'Sign in to your NCLEX Pro Solutions account'],
+    register:['Create Account',  'Register to begin your NCLEX journey'],
+    admin:   ['Admin Access',    'Restricted to authorised personnel only']
+  };
+  document.getElementById('auth-title').textContent = titles[t]?titles[t][0]:'Portal';
+  document.getElementById('auth-sub').textContent   = titles[t]?titles[t][1]:'';
 }
 
 // ══════════════════════════════════════════════
