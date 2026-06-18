@@ -511,15 +511,19 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
 
       <!-- REGISTER SUCCESS -->
       <div id="f-reg-success" style="display:none;text-align:center;padding:1rem 0">
-        <div style="font-size:2.5rem;margin-bottom:.75rem">📧</div>
-        <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Check Your Email</div>
-        <p style="color:var(--muted);font-size:.84rem;line-height:1.7;margin-bottom:1.25rem">Your account has been created. We have sent your <strong>login details and a confirmation link</strong> to your email address. Please check your inbox and confirm your email before logging in.</p>
-        <div style="background:var(--pale);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:1.25rem;font-size:.8rem;color:var(--mid);text-align:left;line-height:1.8">
-          <strong style="color:var(--ink)">Your reference number:</strong><br>
-          <span id="new-ref" style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--teal)">NPS-2025-—</span>
+        <div style="font-size:2.5rem;margin-bottom:.75rem">✅</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:.4rem">Account Created!</div>
+        <p style="color:var(--muted);font-size:.84rem;line-height:1.7;margin-bottom:1.25rem">Your NCLEX Pro Solutions account is ready. Save your login details below — you will need them to sign in.</p>
+        <div style="background:var(--pale);border-radius:var(--r);padding:1rem;margin-bottom:1rem;text-align:left;line-height:2">
+          <div style="font-size:.72rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem">Your Login Details</div>
+          <div style="font-size:.8rem;color:var(--mid)">Reference: <strong style="color:var(--ink);font-family:monospace" id="new-ref">—</strong></div>
+          <div style="font-size:.8rem;color:var(--mid)">Email: <strong style="color:var(--ink)" id="new-email">—</strong></div>
+          <div style="font-size:.8rem;color:var(--mid)">Temporary password: <strong style="color:var(--ink);font-family:monospace;font-size:.9rem" id="new-pwd">—</strong></div>
         </div>
-        <p style="font-size:.75rem;color:var(--faint);margin-bottom:1rem">Can't find the email? Check your spam folder.</p>
-        <button class="btn btn-ghost btn-block" onclick="switchAuthTab('login',document.querySelectorAll('.auth-tab')[0])">Go to Sign In →</button>
+        <div style="background:#fffbeb;border:1px solid rgba(200,150,12,.2);border-radius:var(--r);padding:.75rem;font-size:.75rem;color:#b45309;margin-bottom:1rem;text-align:left">
+          ⚠️ <strong>Save this password now.</strong> Use it to sign in, then change it from your profile settings.
+        </div>
+        <button class="btn btn-primary btn-block" onclick="switchAuthTab('login',document.querySelectorAll('.auth-tab')[0])">Go to Sign In →</button>
       </div>
 
       <!-- ADMIN -->
@@ -1110,14 +1114,28 @@ async function doLogin(){
   const email    = document.getElementById('l-email').value.trim();
   const password = document.getElementById('l-pw').value;
   const errEl    = document.getElementById('l-err');
-  if(!email||!password){ errEl.textContent='Please enter your email and password.'; errEl.style.display='block'; return; }
 
+  if(!email || !password){
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const loginBtn = document.querySelector('#f-login .btn-primary');
+  if(loginBtn){ loginBtn.textContent = 'Signing in...'; loginBtn.disabled = true; }
   showToast('Signing in...');
+
   const { data, error } = await db.auth.signInWithPassword({ email, password });
 
+  if(loginBtn){ loginBtn.textContent = 'Sign In →'; loginBtn.disabled = false; }
+
   if(error){
-    errEl.textContent = 'Incorrect email or password. Please try again.';
+    let msg = 'Incorrect email or password. Please try again.';
+    if(error.message.includes('Email not confirmed'))
+      msg = 'Please confirm your email address first. Check your inbox for a confirmation link.';
+    errEl.textContent = msg;
     errEl.style.display = 'block';
+    showToast('');
   } else {
     errEl.style.display = 'none';
     currentUser = data.user;
@@ -1133,124 +1151,20 @@ async function doLogin(){
 // ══════════════════════════════════════════════
 // RESEND CONFIG — paste your Resend API key here
 // ══════════════════════════════════════════════
-const RESEND_KEY = 're_J6F8xrqh_N8QkfbFfnJNGAxpVyZ2YQBdR’;
+const RESEND_KEY = 'YOUR_RESEND_API_KEY'; // get free at resend.com — starts with re_
 
 async function sendWelcomeEmail(to, firstName, ref, tempPwd) {
-  // Calls Resend API to send a branded welcome email with login details
+  // NOTE: Direct browser-to-Resend calls are blocked by CORS.
+  // Store credentials in Supabase so admin can view them,
+  // and show them on screen. Email delivery requires a server/edge function.
   try {
-    const portalUrl = window.location.origin + window.location.pathname;
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + RESEND_KEY,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'NCLEX Pro Solutions <noreply@nclexprosolutions.com>',
-        to: [to],
-        subject: 'Welcome to NCLEX Pro Solutions — Your Login Details',
-        html: `
-          <!DOCTYPE html>
-          <html>
-          <head><meta charset="UTF-8"/></head>
-          <body style="margin:0;padding:0;background:#f8f9fb;font-family:Arial,sans-serif">
-            <div style="max-width:580px;margin:40px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)">
-
-              <!-- Header -->
-              <div style="background:#07192f;padding:32px 40px;text-align:center">
-                <div style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-.02em">
-                  NCLEX <span style="color:#00c9b5">Pro</span> Solutions
-                </div>
-                <div style="color:rgba(255,255,255,.4);font-size:12px;margin-top:4px;text-transform:uppercase;letter-spacing:.08em">Client Portal</div>
-              </div>
-
-              <!-- Body -->
-              <div style="padding:40px">
-                <h2 style="margin:0 0 8px;font-size:22px;color:#0d1b2a">Welcome, ${firstName}! 🎉</h2>
-                <p style="color:#6b7f96;font-size:15px;line-height:1.65;margin:0 0 28px">
-                  Your NCLEX Pro Solutions account has been created. Here are your login details — please keep them safe.
-                </p>
-
-                <!-- Login Details Box -->
-                <div style="background:#eef1f6;border-radius:10px;padding:24px;margin-bottom:28px">
-                  <div style="font-size:11px;font-weight:700;color:#6b7f96;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px">Your Login Details</div>
-                  <table style="width:100%;border-collapse:collapse">
-                    <tr>
-                      <td style="font-size:13px;color:#6b7f96;padding:6px 0;width:40%">Portal URL</td>
-                      <td style="font-size:13px;font-weight:600;color:#0d1b2a;padding:6px 0">
-                        <a href="${portalUrl}" style="color:#00a896">${portalUrl}</a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="font-size:13px;color:#6b7f96;padding:6px 0">Email</td>
-                      <td style="font-size:13px;font-weight:600;color:#0d1b2a;padding:6px 0">${to}</td>
-                    </tr>
-                    <tr>
-                      <td style="font-size:13px;color:#6b7f96;padding:6px 0">Password</td>
-                      <td style="font-size:15px;font-weight:700;color:#07192f;padding:6px 0;font-family:monospace;letter-spacing:.05em">${tempPwd}</td>
-                    </tr>
-                    <tr>
-                      <td style="font-size:13px;color:#6b7f96;padding:6px 0">Reference No.</td>
-                      <td style="font-size:15px;font-weight:700;color:#00a896;padding:6px 0;font-family:monospace">${ref}</td>
-                    </tr>
-                  </table>
-                </div>
-
-                <!-- CTA Button -->
-                <div style="text-align:center;margin-bottom:28px">
-                  <a href="${portalUrl}" style="display:inline-block;background:#00a896;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:50px;box-shadow:0 4px 16px rgba(0,168,150,.3)">
-                    Log In to Your Portal →
-                  </a>
-                </div>
-
-                <!-- Next Steps -->
-                <div style="border-left:3px solid #00a896;padding-left:16px;margin-bottom:28px">
-                  <div style="font-size:13px;font-weight:700;color:#0d1b2a;margin-bottom:10px">Next Steps After Logging In</div>
-                  <ol style="margin:0;padding-left:18px;color:#6b7f96;font-size:13px;line-height:2">
-                    <li>Complete your <strong style="color:#0d1b2a">Application Form</strong> — personal info, nursing background, and target country</li>
-                    <li>Upload your <strong style="color:#0d1b2a">Documents</strong> — passport, NMC licence, certificates, transcripts</li>
-                    <li>Book your <strong style="color:#0d1b2a">Free Discovery Call</strong> with Tilly</li>
-                  </ol>
-                </div>
-
-                <!-- Password change note -->
-                <div style="background:#fffbeb;border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:14px 16px;margin-bottom:28px">
-                  <p style="margin:0;font-size:13px;color:#b45309;line-height:1.6">
-                    <strong>Security tip:</strong> After your first login, go to your profile settings and change your password to something memorable.
-                  </p>
-                </div>
-
-                <p style="color:#6b7f96;font-size:13px;line-height:1.65;margin:0">
-                  Questions? WhatsApp Tilly directly at
-                  <a href="https://wa.me/233504299230" style="color:#00a896;font-weight:600">+233 50 429 9230</a>
-                </p>
-              </div>
-
-              <!-- Footer -->
-              <div style="background:#f8f9fb;border-top:1px solid #eef1f6;padding:24px 40px;text-align:center">
-                <p style="margin:0;font-size:12px;color:#a8b8cc;line-height:1.6">
-                  NCLEX Pro Solutions &nbsp;·&nbsp; info@nclexprosolutions.com<br>
-                  Accra, Ghana &nbsp;·&nbsp; Serving nurses across Africa and the diaspora
-                </p>
-              </div>
-
-            </div>
-          </body>
-          </html>
-        `
-      })
-    });
-
-    if(!res.ok){
-      const err = await res.json();
-      console.error('Resend error:', err);
-      return false;
-    }
-    return true;
-  } catch(err) {
-    console.error('Email send failed:', err);
-    return false;
-  }
+    // Store the temp password in Supabase for admin reference
+    await db.from('clients')
+      .update({ temp_password: tempPwd })
+      .eq('email', to);
+  } catch(e) { /* non-critical */ }
+  // Always return true so registration flow continues
+  return true;
 }
 
 async function doRegister(){
@@ -1280,7 +1194,8 @@ async function doRegister(){
     email,
     password: tempPwd,
     options: {
-      data: { first_name: firstName, last_name: lastName },
+      data: { first_name: firstName, last_name: lastName, role: 'client' },
+      // emailRedirectTo only needed if Confirm Email is ON in Supabase
       emailRedirectTo: window.location.origin + window.location.pathname,
     }
   });
@@ -1311,14 +1226,18 @@ async function doRegister(){
   // 3. Send welcome email with login details via Resend
   const emailSent = await sendWelcomeEmail(email, firstName, ref, tempPwd);
 
-  // 4. Show success screen
-  document.getElementById('new-ref').textContent         = ref;
+  // 4. Show success screen with login details
+  const newRefEl  = document.getElementById('new-ref');
+  const newEmailEl= document.getElementById('new-email');
+  const newPwdEl  = document.getElementById('new-pwd');
+  if(newRefEl)   newRefEl.textContent   = ref;
+  if(newEmailEl) newEmailEl.textContent = email;
+  if(newPwdEl)   newPwdEl.textContent   = tempPwd;
+
   document.getElementById('f-register').style.display    = 'none';
   document.getElementById('f-reg-success').style.display = 'block';
   document.getElementById('auth-title').textContent      = 'Account Created!';
-  document.getElementById('auth-sub').textContent        = emailSent
-    ? 'Login details sent to ' + email
-    : 'Account created — check your email to log in';
+  document.getElementById('auth-sub').textContent        = 'Save your login details below';
 
   btn.textContent = 'Create Account →';
   btn.disabled = false;
@@ -1332,32 +1251,62 @@ async function doAdminLogin(){
   const password = document.getElementById('adm-pw').value;
   const errEl    = document.getElementById('adm-err');
 
-  const { data, error } = await db.auth.signInWithPassword({ email, password });
-  if(error){ errEl.style.display='block'; return; }
+  if(!email || !password){
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block';
+    return;
+  }
 
-  // Verify admin role
-  const { data: profile } = await db.from('clients').select('role').eq('email', email).single();
-  if(!profile || profile.role !== 'admin'){
-    errEl.textContent = 'Access denied — not an admin account.';
+  showToast('Signing in...');
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+  if(error){
+    errEl.textContent = 'Incorrect email or password.';
+    errEl.style.display = 'block';
+    showToast('');
+    return;
+  }
+
+  // Try to get role from clients table
+  // Note: if RLS blocks this, try checking Supabase auth user metadata
+  let isAdmin = false;
+  try {
+    const { data: profile, error: profileErr } = await db
+      .from('clients')
+      .select('role')
+      .eq('email', email)
+      .maybeSingle(); // maybeSingle does not throw on 0 rows
+
+    if(profile && profile.role === 'admin') {
+      isAdmin = true;
+    } else if(profileErr) {
+      console.warn('Profile fetch error (check RLS):', profileErr.message);
+      // Fallback: check user metadata set during signup
+      const meta = data.user?.user_metadata;
+      if(meta && meta.role === 'admin') isAdmin = true;
+    }
+  } catch(e) {
+    console.error('Admin check error:', e);
+  }
+
+  if(!isAdmin){
+    errEl.textContent = 'Access denied — not an admin account. Check your role in Supabase.';
     errEl.style.display = 'block';
     await db.auth.signOut();
     return;
   }
+
   errEl.style.display = 'none';
   showScreen('s-admin');
-  // Make sure the overview tab is visible
   ['at-clients','at-book','at-pay'].forEach(s=>{
     const e=document.getElementById(s);
     if(e) e.style.display='none';
   });
   const dashEl = document.getElementById('at-dash');
   if(dashEl) dashEl.style.display='block';
-  // Mark Overview as active
-  const firstAdminItem = document.querySelector('.admin-item');
-  if(firstAdminItem){
-    document.querySelectorAll('.admin-item').forEach(i=>i.classList.remove('on'));
-    firstAdminItem.classList.add('on');
-  }
+  document.querySelectorAll('.admin-item').forEach(i=>i.classList.remove('on'));
+  const firstItem = document.querySelector('.admin-item');
+  if(firstItem) firstItem.classList.add('on');
   loadAdminDash();
 }
 
@@ -1365,7 +1314,10 @@ async function doAdminLogin(){
 // LOAD CLIENT PROFILE
 // ══════════════════════════════════════════════
 async function loadClientProfile(email){
-  const { data } = await db.from('clients').select('*').eq('email', email).single();
+  // Uses .maybeSingle() to avoid throwing on missing rows
+  // If this returns null, check RLS policies in Supabase — clients need SELECT on own row
+  const { data, error } = await db.from('clients').select('*').eq('email', email).maybeSingle();
+  if(error) console.error('loadClientProfile error (check RLS):', error.message);
   if(!data) return;
   clientProfile = data;
 
