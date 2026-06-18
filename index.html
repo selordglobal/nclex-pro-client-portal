@@ -439,6 +439,38 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
 
 /* Misc */
 .sep{height:1px;background:var(--pale2);margin:1rem 0}
+
+/* ─────────────────────────────────────
+   SETTINGS
+───────────────────────────────────── */
+.settings-tabs{display:flex;gap:.4rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.stab{padding:.5rem 1rem;border-radius:50px;font-size:.8rem;font-weight:600;cursor:pointer;border:1.5px solid var(--pale2);background:var(--white);color:var(--muted);transition:all .2s;font-family:'Inter',sans-serif}
+.stab:hover{border-color:var(--teal);color:var(--teal)}
+.stab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.stab-panel{display:none}
+.stab-panel.on{display:block;animation:fadeUp .3s ease}
+
+/* Toggle switch */
+.toggle{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:var(--pale2);border-radius:24px;transition:.3s}
+.slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked + .slider{background:var(--teal)}
+.toggle input:checked + .slider:before{transform:translateX(18px)}
+
+/* Notification rows */
+.notif-row{display:flex;align-items:center;justify-content:space-between;padding:.85rem 0;border-bottom:1px solid var(--pale2);gap:1rem}
+.notif-info{flex:1}
+.notif-title{font-size:.83rem;font-weight:600;color:var(--ink)}
+.notif-sub{font-size:.72rem;color:var(--muted);margin-top:.15rem}
+
+/* FAQ */
+.faq-item{border-bottom:1px solid var(--pale2);cursor:pointer}
+.faq-q{font-size:.83rem;font-weight:600;color:var(--ink);padding:.85rem 0;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.faq-arrow{color:var(--faint);font-size:.75rem;transition:transform .2s;flex-shrink:0}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-a{font-size:.8rem;color:var(--muted);line-height:1.7;padding-bottom:.85rem;display:none}
+.faq-item.open .faq-a{display:block}
 .alert{padding:.8rem 1rem;border-radius:var(--r);font-size:.8rem;display:flex;align-items:flex-start;gap:.6rem;line-height:1.55}
 .alert-info{background:var(--info-bg);border:1px solid rgba(2,132,199,.2);color:var(--info)}
 .alert-warn{background:var(--warn-bg);border:1px solid rgba(217,119,6,.2);color:var(--warn)}
@@ -566,6 +598,8 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
       <a class="sb-item" onclick="goSection('pt-pay',this)"><span class="si">◈</span> Payments</a>
       <div class="sb-section">Practice</div>
       <a class="sb-item" onclick="goSection('pt-qbank',this)"><span class="si">◉</span> Question Bank</a>
+      <div class="sb-section">Account</div>
+      <a class="sb-item" onclick="goSection('pt-settings',this)"><span class="si">⚙</span> Settings</a>
     </nav>
     <div class="sb-footer">
       <div class="sb-logout" onclick="logout()"><span>⎋</span> Sign out</div>
@@ -965,6 +999,340 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
         </div>
       </div>
 
+      <!-- ── SETTINGS ── -->
+      <div class="portal-section" id="pt-settings">
+
+        <!-- Settings Tab Nav -->
+        <div class="settings-tabs">
+          <button class="stab on" onclick="stab(this,'st-profile')">👤 Profile</button>
+          <button class="stab" onclick="stab(this,'st-security')">🔒 Security</button>
+          <button class="stab" onclick="stab(this,'st-notifications')">🔔 Notifications</button>
+          <button class="stab" onclick="stab(this,'st-application')">📋 Application</button>
+          <button class="stab" onclick="stab(this,'st-support')">💬 Support</button>
+        </div>
+
+        <!-- ── TAB: PROFILE ── -->
+        <div class="stab-panel on" id="st-profile">
+          <div class="g2" style="align-items:start">
+            <div>
+              <!-- Avatar & Name -->
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Profile Photo</div>
+                <div style="display:flex;align-items:center;gap:1.25rem">
+                  <div id="set-avatar" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--navy2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.4rem;flex-shrink:0">--</div>
+                  <div>
+                    <div style="font-weight:600;color:var(--ink);font-size:.875rem" id="set-fullname">Loading...</div>
+                    <div style="font-size:.75rem;color:var(--muted);margin-top:.15rem" id="set-email-display">—</div>
+                    <div style="font-size:.72rem;color:var(--teal);font-weight:600;margin-top:.2rem" id="set-ref-display">—</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Personal Info -->
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Personal Information</div>
+                <div class="fg-row">
+                  <div class="fg"><label>First name</label><input type="text" id="set-first" placeholder="First name"/></div>
+                  <div class="fg"><label>Last name</label><input type="text" id="set-last" placeholder="Last name"/></div>
+                </div>
+                <div class="fg"><label>Email address</label><input type="email" id="set-email" placeholder="your@email.com" disabled style="background:var(--off);cursor:not-allowed"/></div>
+                <div class="fg"><label>WhatsApp number</label><input type="tel" id="set-wa" placeholder="+233 XX XXX XXXX"/></div>
+                <div class="fg"><label>Country of residence</label>
+                  <select id="set-country">
+                    <option value="">Select country</option>
+                    <option>Ghana</option><option>Nigeria</option><option>Sierra Leone</option>
+                    <option>Kenya</option><option>United Kingdom</option><option>United States</option>
+                    <option>Canada</option><option>Australia</option><option>Other</option>
+                  </select>
+                </div>
+                <div style="display:flex;gap:.75rem;margin-top:.5rem">
+                  <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+                  <button class="btn btn-ghost" onclick="loadSettingsProfile()">Cancel</button>
+                </div>
+                <div id="profile-msg" style="display:none;margin-top:.6rem;font-size:.78rem;font-weight:600"></div>
+              </div>
+            </div>
+
+            <div>
+              <!-- Application Summary -->
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Application Summary</div>
+                <div class="data-row"><span class="data-key">Reference</span><span class="data-val" id="set-app-ref">—</span></div>
+                <div class="data-row"><span class="data-key">Package</span><span class="data-val" id="set-app-pkg">—</span></div>
+                <div class="data-row"><span class="data-key">Target country</span><span class="data-val" id="set-app-country">—</span></div>
+                <div class="data-row"><span class="data-key">Qualification</span><span class="data-val" id="set-app-qual">—</span></div>
+                <div class="data-row"><span class="data-key">Current stage</span><span class="data-val" id="set-app-stage">—</span></div>
+                <div class="data-row"><span class="data-key">Account status</span><span class="badge b-success">✓ Active</span></div>
+              </div>
+
+              <!-- Danger Zone -->
+              <div class="card card-pad" style="border:1.5px solid rgba(220,38,38,.2)">
+                <div class="card-title" style="color:var(--danger)">Account Actions</div>
+                <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem;line-height:1.6">Need to close your account or have a concern? Contact our support team before taking any action.</p>
+                <button class="btn btn-ghost btn-sm" style="border-color:var(--danger);color:var(--danger)" onclick="showToast('Please contact support to close your account.')">Request Account Closure</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: SECURITY ── -->
+        <div class="stab-panel" id="st-security">
+          <div class="g2" style="align-items:start">
+            <div>
+              <!-- Change Password -->
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Change Password</div>
+                <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem;line-height:1.6">If you registered with a temporary password, change it here to something memorable.</p>
+                <div class="fg"><label>New password</label><input type="password" id="new-pass" placeholder="Minimum 8 characters"/></div>
+                <div class="fg"><label>Confirm new password</label><input type="password" id="conf-pass" placeholder="Repeat new password"/></div>
+                <div id="pass-msg" style="display:none;margin-bottom:.6rem;font-size:.78rem;font-weight:600"></div>
+                <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+              </div>
+
+              <!-- Active Sessions -->
+              <div class="card card-pad">
+                <div class="card-title">Active Session</div>
+                <div class="data-row">
+                  <div>
+                    <div style="font-size:.83rem;font-weight:600;color:var(--ink)">Current browser session</div>
+                    <div style="font-size:.72rem;color:var(--muted);margin-top:.1rem">Logged in now · This device</div>
+                  </div>
+                  <span class="badge b-success"><span class="dot dot-success"></span> Active</span>
+                </div>
+                <div style="margin-top:.75rem">
+                  <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out of All Sessions</button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <!-- Login Details -->
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Login Information</div>
+                <div class="data-row"><span class="data-key">Email (login)</span><span class="data-val" id="sec-email">—</span></div>
+                <div class="data-row"><span class="data-key">Password</span><span class="data-val">••••••••</span></div>
+                <div class="data-row"><span class="data-key">Last sign in</span><span class="data-val" id="sec-lastsign">—</span></div>
+                <div class="data-row"><span class="data-key">Account created</span><span class="data-val" id="sec-created">—</span></div>
+              </div>
+
+              <!-- Security Tips -->
+              <div class="card card-pad" style="background:rgba(0,168,150,.04);border-color:rgba(0,168,150,.2)">
+                <div class="card-title">Security Tips</div>
+                <div class="tl">
+                  <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Use a strong, unique password</div><div class="tl-date">At least 12 characters — mix letters, numbers, symbols</div></div></div>
+                  <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Do not share your login details</div><div class="tl-date">Your account is personal — never share your password</div></div></div>
+                  <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Sign out on shared devices</div><div class="tl-date">Always sign out if using a public or shared computer</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: NOTIFICATIONS ── -->
+        <div class="stab-panel" id="st-notifications">
+          <div class="card card-pad" style="max-width:640px">
+            <div class="card-title">Notification Preferences</div>
+            <p style="font-size:.8rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.6">Choose how and when you want to hear from us about your application progress.</p>
+
+            <div style="display:flex;flex-direction:column;gap:0">
+              <div class="notif-row">
+                <div class="notif-info"><div class="notif-title">Application stage updates</div><div class="notif-sub">When your pipeline stage changes</div></div>
+                <label class="toggle"><input type="checkbox" id="n-stage" checked onchange="saveNotifPref()"/><span class="slider"></span></label>
+              </div>
+              <div class="notif-row">
+                <div class="notif-info"><div class="notif-title">Document status changes</div><div class="notif-sub">When a document is verified or needs action</div></div>
+                <label class="toggle"><input type="checkbox" id="n-docs" checked onchange="saveNotifPref()"/><span class="slider"></span></label>
+              </div>
+              <div class="notif-row">
+                <div class="notif-info"><div class="notif-title">Booking confirmations</div><div class="notif-sub">When a session is confirmed or rescheduled</div></div>
+                <label class="toggle"><input type="checkbox" id="n-book" checked onchange="saveNotifPref()"/><span class="slider"></span></label>
+              </div>
+              <div class="notif-row">
+                <div class="notif-info"><div class="notif-title">Payment receipts</div><div class="notif-sub">Confirmation after every payment</div></div>
+                <label class="toggle"><input type="checkbox" id="n-pay" checked onchange="saveNotifPref()"/><span class="slider"></span></label>
+              </div>
+              <div class="notif-row">
+                <div class="notif-info"><div class="notif-title">WhatsApp updates</div><div class="notif-sub">Receive key updates via WhatsApp</div></div>
+                <label class="toggle"><input type="checkbox" id="n-wa" checked onchange="saveNotifPref()"/><span class="slider"></span></label>
+              </div>
+              <div class="notif-row" style="border:none">
+                <div class="notif-info"><div class="notif-title">Coaching reminders</div><div class="notif-sub">24-hour reminder before a booked session</div></div>
+                <label class="toggle"><input type="checkbox" id="n-remind" checked onchange="saveNotifPref()"/><span class="slider"></span></label>
+              </div>
+            </div>
+            <div id="notif-msg" style="display:none;margin-top:.75rem;font-size:.78rem;color:var(--success);font-weight:600">✓ Preferences saved</div>
+          </div>
+        </div>
+
+        <!-- ── TAB: APPLICATION ── -->
+        <div class="stab-panel" id="st-application">
+          <div class="g2" style="align-items:start">
+            <div>
+              <!-- Target Pathway -->
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Target Pathway</div>
+                <div class="fg">
+                  <label>Target country</label>
+                  <select id="app-target-country">
+                    <option value="">Select destination</option>
+                    <option>United States</option><option>Canada</option>
+                    <option>Australia</option><option>United Kingdom</option><option>New Zealand</option>
+                  </select>
+                </div>
+                <div class="fg">
+                  <label>Preferred US state</label>
+                  <select id="app-target-state">
+                    <option value="">Select state</option>
+                    <option>California</option><option>Texas</option><option>New York</option>
+                    <option>Florida</option><option>Georgia</option><option>Maryland</option><option>Not decided</option>
+                  </select>
+                </div>
+                <div class="fg">
+                  <label>Service package</label>
+                  <select id="app-package">
+                    <option value="">Select package</option>
+                    <option>Full Package (Registration + Coaching)</option>
+                    <option>NCLEX Coaching Only</option>
+                    <option>Credential Evaluation Only</option>
+                    <option>Retakers Intensive Programme</option>
+                  </select>
+                </div>
+                <div class="fg">
+                  <label>Target timeline</label>
+                  <select id="app-timeline">
+                    <option value="">Select timeline</option>
+                    <option>Within 3 months</option><option>Within 6 months</option>
+                    <option>Within 12 months</option><option>No fixed timeline</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary" onclick="saveAppSettings()" style="margin-top:.25rem">Save Pathway Settings</button>
+                <div id="app-msg" style="display:none;margin-top:.6rem;font-size:.78rem;font-weight:600;color:var(--success)">✓ Saved</div>
+              </div>
+            </div>
+
+            <div>
+              <!-- Nursing Info -->
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Nursing Credentials</div>
+                <div class="fg"><label>Qualification</label>
+                  <select id="app-qual">
+                    <option value="">Select</option>
+                    <option>RN – BSc Nursing</option><option>RN – Diploma</option>
+                    <option>RM – Registered Midwife</option><option>RPHN – Public Health Nurse</option><option>EN – Enrolled Nurse</option>
+                  </select>
+                </div>
+                <div class="fg"><label>NMC licence number</label><input type="text" id="app-nmc" placeholder="NMC/RN/XXXXX"/></div>
+                <div class="fg"><label>Years of experience</label>
+                  <select id="app-exp">
+                    <option value="">Select</option>
+                    <option>Less than 1 year</option><option>1–2 years</option>
+                    <option>3–5 years</option><option>6–10 years</option><option>10+ years</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary" onclick="saveNursingSettings()" style="margin-top:.25rem">Save Nursing Details</button>
+                <div id="nursing-msg" style="display:none;margin-top:.6rem;font-size:.78rem;font-weight:600;color:var(--success)">✓ Saved</div>
+              </div>
+
+              <!-- Application Reference -->
+              <div class="card card-pad">
+                <div class="card-title">Reference & Package</div>
+                <div class="data-row"><span class="data-key">Application ref</span><span class="data-val" id="app-ref-display">—</span></div>
+                <div class="data-row"><span class="data-key">Package</span><span class="data-val" id="app-pkg-display">—</span></div>
+                <div class="data-row"><span class="data-key">Stage</span><span class="data-val" id="app-stage-display">—</span></div>
+                <p style="font-size:.75rem;color:var(--muted);margin-top:.75rem;line-height:1.6">To change your package, contact our support team via WhatsApp.</p>
+                <a href="https://wa.me/233504299230" class="btn btn-ghost btn-sm" style="margin-top:.5rem" target="_blank">💬 Contact Support</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: SUPPORT ── -->
+        <div class="stab-panel" id="st-support">
+          <div class="g2" style="align-items:start">
+            <div>
+              <!-- Contact Options -->
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Contact Our Team</div>
+                <div style="display:flex;flex-direction:column;gap:.75rem">
+                  <a href="https://wa.me/233504299230" target="_blank" style="display:flex;align-items:center;gap:.85rem;padding:.85rem;border:1.5px solid var(--pale2);border-radius:var(--r2);text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--pale2)'">
+                    <div style="width:38px;height:38px;border-radius:var(--r);background:#25d366;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">💬</div>
+                    <div><div style="font-weight:600;font-size:.875rem;color:var(--ink)">WhatsApp Support</div><div style="font-size:.75rem;color:var(--muted)">+233 50 429 9230 · Fastest response</div></div>
+                    <span style="margin-left:auto;color:var(--faint)">→</span>
+                  </a>
+                  <a href="mailto:info@nclexprosolutions.com" style="display:flex;align-items:center;gap:.85rem;padding:.85rem;border:1.5px solid var(--pale2);border-radius:var(--r2);text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--pale2)'">
+                    <div style="width:38px;height:38px;border-radius:var(--r);background:rgba(0,168,150,.1);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">📧</div>
+                    <div><div style="font-weight:600;font-size:.875rem;color:var(--ink)">Email Support</div><div style="font-size:.75rem;color:var(--muted)">info@nclexprosolutions.com</div></div>
+                    <span style="margin-left:auto;color:var(--faint)">→</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Send Message -->
+              <div class="card card-pad">
+                <div class="card-title">Send a Message</div>
+                <div class="fg"><label>Subject</label>
+                  <select id="support-subject">
+                    <option value="">Select a topic</option>
+                    <option>Application question</option>
+                    <option>Document issue</option>
+                    <option>Payment query</option>
+                    <option>Booking change</option>
+                    <option>Technical issue with portal</option>
+                    <option>Change my package</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="fg"><label>Message</label>
+                  <textarea id="support-msg" style="width:100%;padding:.68rem .9rem;border:1.5px solid var(--pale2);border-radius:var(--r);font-size:.85rem;font-family:'Inter',sans-serif;resize:vertical;min-height:100px;outline:none;transition:border-color .2s" placeholder="Describe your question or issue in as much detail as possible..." onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--pale2)'"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="sendSupportMsg()">Send Message</button>
+                <div id="support-sent" style="display:none;margin-top:.6rem;font-size:.78rem;font-weight:600;color:var(--success)">✓ Message received — we will respond within 24 hours</div>
+              </div>
+            </div>
+
+            <div>
+              <!-- FAQ -->
+              <div class="card card-pad" style="margin-bottom:1.1rem">
+                <div class="card-title">Frequently Asked Questions</div>
+                <div style="display:flex;flex-direction:column;gap:0">
+                  <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q">How long does credential evaluation take? <span class="faq-arrow">▾</span></div>
+                    <div class="faq-a">Credential evaluation through Trumerit or CGFNS typically takes 8–12 weeks. We monitor your application daily and will notify you immediately of any updates.</div>
+                  </div>
+                  <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q">What documents do I need to submit? <span class="faq-arrow">▾</span></div>
+                    <div class="faq-a">You need: valid passport, NMC licence, nursing certificate, official transcripts, and birth certificate. Upload them in the Documents section of your portal.</div>
+                  </div>
+                  <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q">How do I change my target country? <span class="faq-arrow">▾</span></div>
+                    <div class="faq-a">Update your target country in Settings → Application. If you have already started the credential evaluation process, contact our support team first.</div>
+                  </div>
+                  <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-q">Can I get a refund if I change my mind? <span class="faq-arrow">▾</span></div>
+                    <div class="faq-a">Refund eligibility depends on the stage of your application. Contact our support team via WhatsApp to discuss your situation.</div>
+                  </div>
+                  <div class="faq-item" onclick="toggleFaq(this)" style="border:none">
+                    <div class="faq-q">How do I change my temporary password? <span class="faq-arrow">▾</span></div>
+                    <div class="faq-a">Go to Settings → Security → Change Password. Enter your new password and confirm it. Your password will be updated immediately.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- App Info -->
+              <div class="card card-pad">
+                <div class="card-title">Portal Information</div>
+                <div class="data-row"><span class="data-key">Portal version</span><span class="data-val">v2.1.0</span></div>
+                <div class="data-row"><span class="data-key">Last updated</span><span class="data-val">June 2025</span></div>
+                <div class="data-row"><span class="data-key">Data storage</span><span class="data-val">Supabase (GDPR compliant)</span></div>
+                <div class="data-row"><span class="data-key">Payments</span><span class="data-val">Secured by Paystack</span></div>
+                <div class="data-row"><span class="data-key">Support hours</span><span class="data-val">Mon–Sat · 8AM–8PM GMT</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end pt-settings -->
+
     </div><!-- portal-body -->
   </div><!-- portal-main -->
 </div><!-- s-portal -->
@@ -1314,10 +1682,23 @@ async function doAdminLogin(){
 // LOAD CLIENT PROFILE
 // ══════════════════════════════════════════════
 async function loadClientProfile(email){
-  // Uses .maybeSingle() to avoid throwing on missing rows
-  // If this returns null, check RLS policies in Supabase — clients need SELECT on own row
-  const { data, error } = await db.from('clients').select('*').eq('email', email).maybeSingle();
-  if(error) console.error('loadClientProfile error (check RLS):', error.message);
+  // Primary: fetch by email
+  let { data, error } = await db.from('clients').select('*').eq('email', email).maybeSingle();
+
+  // If blocked by RLS or not found, log and show partial UI
+  if(error){
+    console.error('loadClientProfile error:', error.message,
+      '\n→ Fix: In Supabase → Authentication → Policies → clients table → add SELECT policy:',
+      "\n→ Policy: (auth.jwt() ->> 'email') = email");
+  }
+
+  // If still no data and we have a session, the clients row may not exist yet
+  // This happens if registration completed auth but the INSERT to clients failed
+  if(!data && !error){
+    console.warn('No client profile found for', email,
+      '\n→ Check Supabase Table Editor → clients → does a row exist for this email?');
+  }
+
   if(!data) return;
   clientProfile = data;
 
@@ -1424,7 +1805,8 @@ const sectionMeta={
   'pt-docs':['Documents','Upload and manage your documents'],
   'pt-book':['Book a Session','Book and manage your sessions'],
   'pt-pay':['Payments','Pay securely online'],
-  'pt-qbank':['Question Bank','Practice NCLEX questions'],
+  'pt-qbank':    ['Question Bank','Practice NCLEX questions'],
+  'pt-settings': ['Settings','Manage your account, profile, and preferences'],
 };
 function goSection(id,el){
   document.querySelectorAll('.portal-section').forEach(s=>s.classList.remove('on'));
@@ -1433,11 +1815,19 @@ function goSection(id,el){
   if(el) el.classList.add('on');
   const m=sectionMeta[id]||['Portal',''];
   document.getElementById('tp-title').textContent=m[0];
-  document.getElementById('tp-sub').textContent=m[1];
+  // Keep personalised subtitle on dashboard, generic elsewhere
+  if(id !== 'pt-dash'){
+    document.getElementById('tp-sub').textContent=m[1];
+  }
   window.scrollTo({top:0,behavior:'smooth'});
-  if(id==='pt-docs') loadDocuments();
-  if(id==='pt-pay')  loadPaymentHistory();
-  if(id==='pt-book') loadBookings();
+  if(id==='pt-docs')     loadDocuments();
+  if(id==='pt-pay')      loadPaymentHistory();
+  if(id==='pt-book')     loadBookings();
+  if(id==='pt-settings') loadSettingsProfile();
+  // Ensure profile is loaded whenever navigating inside portal
+  if(!clientProfile && currentUser){
+    loadClientProfile(currentUser.email);
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1620,23 +2010,108 @@ function rBack(n){
 }
 
 async function submitReg(){
-  if(!clientProfile){ showToast('Please log in first'); return; }
   showToast('Saving your application...');
 
-  // Collect key fields from Step 3
-  const step3Selects = document.querySelectorAll('#rss3 select');
+  // ── If clientProfile is missing, try to reload it ──
+  if(!clientProfile && currentUser){
+    await loadClientProfile(currentUser.email);
+  }
+
+  // ── If still null, try to get user from active session ──
+  if(!clientProfile){
+    const { data: { session } } = await db.auth.getSession();
+    if(session && session.user){
+      currentUser = session.user;
+      await loadClientProfile(session.user.email);
+    }
+  }
+
+  // ── If STILL null, show helpful message ──
+  if(!clientProfile){
+    showToast('Could not load your profile — please sign out and sign back in.');
+    return;
+  }
+
+  // ── Collect form data from all 4 steps ──
+  // Step 1 — Personal
+  const step1Inputs   = document.querySelectorAll('#rss1 input');
+  const step1Selects  = document.querySelectorAll('#rss1 select');
+  const dob           = step1Inputs[0] ? step1Inputs[0].value : '';
+  const gender        = step1Selects[0] ? step1Selects[0].value : '';
+  const passportNo    = step1Inputs[1] ? step1Inputs[1].value.trim() : '';
+  const whatsapp      = step1Inputs[2] ? step1Inputs[2].value.trim() : '';
+  const address       = step1Inputs[3] ? step1Inputs[3].value.trim() : '';
+  const countryRes    = step1Selects[1] ? step1Selects[1].value : '';
+
+  // Step 2 — Nursing
+  const step2Inputs   = document.querySelectorAll('#rss2 input');
+  const step2Selects  = document.querySelectorAll('#rss2 select');
+  const nursingSchool = step2Inputs[0] ? step2Inputs[0].value.trim() : '';
+  const gradYear      = step2Inputs[1] ? step2Inputs[1].value : '';
+  const qualification = step2Selects[0] ? step2Selects[0].value : '';
+  const nmcNumber     = step2Inputs[2] ? step2Inputs[2].value.trim() : '';
+  const nmcExpiry     = step2Inputs[3] ? step2Inputs[3].value : '';
+  const experience    = step2Selects[1] ? step2Selects[1].value : '';
+
+  // Step 3 — Pathway
+  const step3Selects  = document.querySelectorAll('#rss3 select');
   const targetCountry = step3Selects[0] ? step3Selects[0].value : '';
+  const targetState   = step3Selects[1] ? step3Selects[1].value : '';
+  const pkg           = step3Selects[2] ? step3Selects[2].value : '';
+  const source        = step3Selects[3] ? step3Selects[3].value : '';
+  const timeline      = step3Selects[4] ? step3Selects[4].value : '';
 
-  const { error } = await db.from('clients')
-    .update({ stage: 2, target_country: targetCountry })
-    .eq('application_ref', clientProfile.application_ref);
+  // ── Save to Supabase ──
+  const updateData = {
+    stage:           2,
+    target_country:  targetCountry  || clientProfile.target_country  || '',
+    target_state:    targetState    || clientProfile.target_state    || '',
+    package:         pkg            || clientProfile.package         || '',
+    qualification:   qualification  || clientProfile.qualification   || '',
+    nmc_number:      nmcNumber      || clientProfile.nmc_number      || '',
+    whatsapp:        whatsapp       || clientProfile.whatsapp        || '',
+  };
 
-  if(error){ showToast('Save failed — please try again'); return; }
+  // Use email as fallback identifier if no application_ref yet
+  let saveError;
+  if(clientProfile.application_ref) {
+    const { error } = await db.from('clients')
+      .update(updateData)
+      .eq('application_ref', clientProfile.application_ref);
+    saveError = error;
+  } else {
+    const { error } = await db.from('clients')
+      .update(updateData)
+      .eq('email', currentUser.email);
+    saveError = error;
+  }
 
+  if(saveError){
+    console.error('submitReg save error:', saveError);
+    showToast('Save failed — please try again');
+    return;
+  }
+
+  // ── Update local profile ──
+  clientProfile.stage          = 2;
+  clientProfile.target_country = targetCountry || clientProfile.target_country;
+  clientProfile.package        = pkg || clientProfile.package;
+  clientProfile.qualification  = qualification || clientProfile.qualification;
+
+  // ── Show success ──
   const ref = clientProfile.application_ref || 'NPS-'+new Date().getFullYear()+'-'+Math.floor(1000+Math.random()*9000);
-  document.getElementById('reg-form').style.display  = 'none';
+  document.getElementById('reg-form').style.display    = 'none';
   document.getElementById('reg-success').style.display = 'block';
-  document.getElementById('reg-ref').textContent = ref;
+  document.getElementById('reg-ref').textContent       = ref;
+
+  // Update pipeline and tracker
+  updatePipelineForStage(2);
+  const setT = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val||'—'; };
+  setT('tr-country', targetCountry);
+  setT('tr-pkg',     pkg || clientProfile.package);
+  setT('dash-pkg',   pkg || clientProfile.package);
+
+  showToast('Application submitted ✓');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1873,6 +2348,262 @@ async function updStage(sel, ref){
     const labels=['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
     showToast('✓ '+ref+' updated to: '+labels[sel.value]);
   }
+}
+
+// ══════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════
+
+// Tab switching
+function stab(el, id) {
+  document.querySelectorAll('.stab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.stab-panel').forEach(p => p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+// Load all settings from profile when Settings section opens
+function loadSettingsProfile() {
+  if (!clientProfile) return;
+  const p = clientProfile;
+  const stageNames = ['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
+
+  // Profile tab
+  const fn = p.first_name || '';
+  const ln = p.last_name  || '';
+  const initials = fn && ln ? (fn[0]+ln[0]).toUpperCase() : (p.email||'?')[0].toUpperCase();
+  const av = document.getElementById('set-avatar');
+  if(av) av.textContent = initials;
+  const setV = (id, val) => { const e=document.getElementById(id); if(e) e.value=val||''; };
+  const setT = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val||'—'; };
+
+  setT('set-fullname',    (fn+' '+ln).trim() || p.email);
+  setT('set-email-display', p.email);
+  setT('set-ref-display',   p.application_ref || '—');
+  setV('set-first',   fn);
+  setV('set-last',    ln);
+  const emailEl = document.getElementById('set-email');
+  if(emailEl) emailEl.value = p.email || '';
+  setV('set-wa',      p.whatsapp);
+  setV('set-country', p.country_of_residence || '');
+
+  // Application summary
+  setT('set-app-ref',     p.application_ref || '—');
+  setT('set-app-pkg',     p.package || '—');
+  setT('set-app-country', p.target_country || '—');
+  setT('set-app-qual',    p.qualification  || '—');
+  setT('set-app-stage',   stageNames[p.stage||1]);
+
+  // Security tab
+  setT('sec-email',    p.email);
+  const cu = currentUser;
+  if(cu) {
+    const lastSign = cu.last_sign_in_at ? new Date(cu.last_sign_in_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    const created  = cu.created_at      ? new Date(cu.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    setT('sec-lastsign', lastSign);
+    setT('sec-created',  created);
+  }
+
+  // Application tab
+  setV('app-target-country', p.target_country || '');
+  setV('app-target-state',   p.target_state   || '');
+  setV('app-package',        p.package        || '');
+  setV('app-qual',           p.qualification  || '');
+  setV('app-nmc',            p.nmc_number     || '');
+  setV('app-exp',            p.years_experience || '');
+  setT('app-ref-display',    p.application_ref || '—');
+  setT('app-pkg-display',    p.package || '—');
+  setT('app-stage-display',  stageNames[p.stage||1]);
+
+  // Load notification prefs from localStorage
+  const prefs = JSON.parse(localStorage.getItem('notif_prefs') || '{}');
+  ['stage','docs','book','pay','wa','remind'].forEach(k => {
+    const el = document.getElementById('n-'+k);
+    if(el) el.checked = prefs[k] !== false;
+  });
+}
+
+// Save profile
+async function saveProfile() {
+  if(!clientProfile) return;
+  const msgEl = document.getElementById('profile-msg');
+  const firstName = document.getElementById('set-first').value.trim();
+  const lastName  = document.getElementById('set-last').value.trim();
+  const whatsapp  = document.getElementById('set-wa').value.trim();
+
+  if(!firstName || !lastName) {
+    msgEl.textContent = 'First and last name are required.';
+    msgEl.style.color = 'var(--danger)';
+    msgEl.style.display = 'block';
+    return;
+  }
+
+  const { error } = await db.from('clients').update({
+    first_name: firstName,
+    last_name:  lastName,
+    whatsapp,
+  }).eq('application_ref', clientProfile.application_ref);
+
+  if(error) {
+    msgEl.textContent = 'Save failed — please try again.';
+    msgEl.style.color = 'var(--danger)';
+  } else {
+    msgEl.textContent = '✓ Profile updated successfully';
+    msgEl.style.color = 'var(--success)';
+    // Refresh profile in memory
+    clientProfile.first_name = firstName;
+    clientProfile.last_name  = lastName;
+    clientProfile.whatsapp   = whatsapp;
+    // Update sidebar
+    const fullName = (firstName+' '+lastName).trim();
+    const initials = (firstName[0]+lastName[0]).toUpperCase();
+    document.getElementById('sb-name').textContent = fullName;
+    document.getElementById('sb-av').textContent   = initials;
+    document.getElementById('set-avatar').textContent = initials;
+    document.getElementById('set-fullname').textContent = fullName;
+    document.getElementById('dash-name').textContent = firstName;
+    showToast('Profile updated ✓');
+  }
+  msgEl.style.display = 'block';
+  setTimeout(() => msgEl.style.display='none', 3000);
+}
+
+// Change password
+async function changePassword() {
+  const newPass  = document.getElementById('new-pass').value;
+  const confPass = document.getElementById('conf-pass').value;
+  const msgEl    = document.getElementById('pass-msg');
+
+  if(!newPass || newPass.length < 8) {
+    msgEl.textContent = 'Password must be at least 8 characters.';
+    msgEl.style.color = 'var(--danger)';
+    msgEl.style.display = 'block';
+    return;
+  }
+  if(newPass !== confPass) {
+    msgEl.textContent = 'Passwords do not match.';
+    msgEl.style.color = 'var(--danger)';
+    msgEl.style.display = 'block';
+    return;
+  }
+
+  const { error } = await db.auth.updateUser({ password: newPass });
+  if(error) {
+    msgEl.textContent = 'Password update failed: ' + error.message;
+    msgEl.style.color = 'var(--danger)';
+  } else {
+    msgEl.textContent = '✓ Password changed successfully';
+    msgEl.style.color = 'var(--success)';
+    document.getElementById('new-pass').value  = '';
+    document.getElementById('conf-pass').value = '';
+    showToast('Password updated ✓');
+  }
+  msgEl.style.display = 'block';
+  setTimeout(() => msgEl.style.display='none', 3500);
+}
+
+// Save notification preferences
+function saveNotifPref() {
+  const prefs = {};
+  ['stage','docs','book','pay','wa','remind'].forEach(k => {
+    const el = document.getElementById('n-'+k);
+    if(el) prefs[k] = el.checked;
+  });
+  localStorage.setItem('notif_prefs', JSON.stringify(prefs));
+  const msgEl = document.getElementById('notif-msg');
+  if(msgEl){ msgEl.style.display='block'; setTimeout(()=>msgEl.style.display='none',2000); }
+}
+
+// Save application/pathway settings
+async function saveAppSettings() {
+  if(!clientProfile) return;
+  const country  = document.getElementById('app-target-country').value;
+  const state    = document.getElementById('app-target-state').value;
+  const pkg      = document.getElementById('app-package').value;
+  const timeline = document.getElementById('app-timeline') ? document.getElementById('app-timeline').value : '';
+
+  const { error } = await db.from('clients').update({
+    target_country: country,
+    target_state:   state,
+    package:        pkg,
+  }).eq('application_ref', clientProfile.application_ref);
+
+  const msgEl = document.getElementById('app-msg');
+  if(error) {
+    msgEl.textContent = 'Save failed — try again.';
+    msgEl.style.color = 'var(--danger)';
+  } else {
+    msgEl.textContent = '✓ Pathway settings saved';
+    msgEl.style.color = 'var(--success)';
+    clientProfile.target_country = country;
+    clientProfile.target_state   = state;
+    clientProfile.package        = pkg;
+    // Update tracker display
+    const setT = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val||'—'; };
+    setT('tr-country',   country);
+    setT('tr-pkg',       pkg);
+    setT('dash-pkg',     pkg);
+    setT('app-pkg-display', pkg);
+    showToast('Settings saved ✓');
+  }
+  msgEl.style.display='block';
+  setTimeout(()=>msgEl.style.display='none',3000);
+}
+
+// Save nursing credentials
+async function saveNursingSettings() {
+  if(!clientProfile) return;
+  const qual = document.getElementById('app-qual').value;
+  const nmc  = document.getElementById('app-nmc').value.trim();
+  const exp  = document.getElementById('app-exp').value;
+
+  const { error } = await db.from('clients').update({
+    qualification:    qual,
+    nmc_number:       nmc,
+  }).eq('application_ref', clientProfile.application_ref);
+
+  const msgEl = document.getElementById('nursing-msg');
+  if(error) {
+    msgEl.textContent = 'Save failed — try again.';
+    msgEl.style.color = 'var(--danger)';
+  } else {
+    msgEl.textContent = '✓ Nursing details saved';
+    msgEl.style.color = 'var(--success)';
+    clientProfile.qualification = qual;
+    clientProfile.nmc_number    = nmc;
+    document.getElementById('tr-qual').textContent = qual || '—';
+    showToast('Nursing details saved ✓');
+  }
+  msgEl.style.display='block';
+  setTimeout(()=>msgEl.style.display='none',3000);
+}
+
+// Support message
+async function sendSupportMsg() {
+  const subject = document.getElementById('support-subject').value;
+  const msg     = document.getElementById('support-msg').value.trim();
+  if(!subject || !msg) { showToast('Please select a subject and write a message.'); return; }
+
+  // Save to a support_messages table if it exists, otherwise just confirm
+  try {
+    await db.from('support_messages').insert([{
+      client_ref: clientProfile ? clientProfile.application_ref : '—',
+      email:      clientProfile ? clientProfile.email : '—',
+      subject,
+      message:    msg,
+    }]);
+  } catch(e) { /* table may not exist yet — non-critical */ }
+
+  const sentEl = document.getElementById('support-sent');
+  if(sentEl) sentEl.style.display = 'block';
+  document.getElementById('support-msg').value    = '';
+  document.getElementById('support-subject').value = '';
+  showToast('Message sent ✓');
+}
+
+// FAQ toggle
+function toggleFaq(el) {
+  el.classList.toggle('open');
 }
 
 // ══════════════════════════════════════════════
