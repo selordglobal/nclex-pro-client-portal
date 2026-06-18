@@ -1578,8 +1578,9 @@ async function doRegister(){
     return;
   }
 
-  // 2. Save client profile to Supabase
-  const { error: dbError } = await db.from('clients').insert([{
+  // 2. Save client profile to Supabase clients table
+  // We retry with the authenticated session to ensure RLS passes
+  const { data: insertData, error: dbError } = await db.from('clients').insert([{
     email,
     first_name:      firstName,
     last_name:       lastName,
@@ -1587,9 +1588,35 @@ async function doRegister(){
     application_ref: ref,
     stage:           1,
     role:            'client'
-  }]);
+  }]).select();
 
-  if(dbError) console.error('Profile save error:', dbError);
+  if(dbError){
+    console.error('Profile save error:', dbError);
+
+    // ── RLS is blocking the INSERT ──
+    // Show a clear error so the client knows what happened
+    errEl.textContent = 'Account created in auth but profile could not be saved. Error: ' + dbError.message
+      + ' — Please contact support with your email address.';
+    errEl.style.display = 'block';
+
+    // Still show success screen so they have their temp password
+    // but flag the issue
+    document.getElementById('new-ref').textContent         = ref;
+    const newEmailEl = document.getElementById('new-email');
+    const newPwdEl   = document.getElementById('new-pwd');
+    if(newEmailEl) newEmailEl.textContent = email;
+    if(newPwdEl)   newPwdEl.textContent   = tempPwd;
+    document.getElementById('f-register').style.display    = 'none';
+    document.getElementById('f-reg-success').style.display = 'block';
+    document.getElementById('auth-title').textContent      = 'Account Created — Action Needed';
+    document.getElementById('auth-sub').textContent        = 'Please contact support — profile not saved';
+    btn.textContent = 'Create Account →';
+    btn.disabled    = false;
+    return;
+  }
+
+  // Profile saved successfully
+  console.log('Client profile saved:', insertData);
 
   // 3. Send welcome email with login details via Resend
   const emailSent = await sendWelcomeEmail(email, firstName, ref, tempPwd);
