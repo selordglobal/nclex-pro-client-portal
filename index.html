@@ -532,10 +532,10 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
     <div class="sb-header">
       <div class="sb-logo">NCLEX <span>Pro</span></div>
       <div class="sb-user">
-        <div class="sb-avatar" id="sb-av">AM</div>
+        <div class="sb-avatar" id="sb-av">--</div>
         <div>
-          <div class="sb-name" id="sb-name">Abena Mensah</div>
-          <div class="sb-ref" id="sb-ref">NPS-2025-0847</div>
+          <div class="sb-name" id="sb-name">Loading...</div>
+          <div class="sb-ref" id="sb-ref">—</div>
         </div>
       </div>
     </div>
@@ -562,7 +562,7 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
     <header class="portal-topbar">
       <div>
         <div class="topbar-title" id="tp-title">Dashboard</div>
-        <div class="topbar-sub" id="tp-sub">Welcome back, Abena</div>
+        <div class="topbar-sub" id="tp-sub">Welcome back</div>
       </div>
       <div class="topbar-actions">
         <a href="https://wa.me/233504299230" class="topbar-wa" target="_blank">💬 WhatsApp Tilly</a>
@@ -577,9 +577,9 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
         <!-- Welcome bar -->
         <div class="welcome-bar fadein">
           <div style="position:relative;z-index:1">
-            <div class="welcome-h">Good day, <em id="dash-name">Abena</em></div>
-            <div class="welcome-sub">Your NCLEX journey is in progress. Here is where things stand today.</div>
-            <div class="welcome-ref"><div class="dot dot-teal"></div> Application Reference: <strong id="dash-ref">NPS-2025-0847</strong> &nbsp;·&nbsp; Package: Full Package</div>
+            <div class="welcome-h">Good day, <em id="dash-name">there</em></div>
+            <div class="welcome-sub" id="dash-sub">Your NCLEX journey is in progress. Here is where things stand today.</div>
+            <div class="welcome-ref"><div class="dot dot-teal"></div> Application Reference: <strong id="dash-ref">—</strong> &nbsp;·&nbsp; Package: <span id="dash-pkg">—</span></div>
           </div>
         </div>
 
@@ -666,12 +666,12 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
         <div class="g2" style="margin-bottom:1.25rem">
           <div class="card card-pad">
             <div class="card-title">Application Status</div>
-            <div class="data-row"><span class="data-key">Reference</span><span class="data-val">NPS-2025-0847</span></div>
-            <div class="data-row"><span class="data-key">Package</span><span class="data-val">Full Package</span></div>
-            <div class="data-row"><span class="data-key">Target Country</span><span class="data-val">🇺🇸 United States — Texas</span></div>
-            <div class="data-row"><span class="data-key">Qualification</span><span class="data-val">RN – BSc Nursing</span></div>
+            <div class="data-row"><span class="data-key">Reference</span><span class="data-val" id="tr-ref">—</span></div>
+            <div class="data-row"><span class="data-key">Package</span><span class="data-val" id="tr-pkg">—</span></div>
+            <div class="data-row"><span class="data-key">Target Country</span><span class="data-val" id="tr-country">—</span></div>
+            <div class="data-row"><span class="data-key">Qualification</span><span class="data-val" id="tr-qual">—</span></div>
             <div class="data-row"><span class="data-key">Coach</span><span class="data-val">Matilda Osae</span></div>
-            <div class="data-row"><span class="data-key">Status</span><span class="badge b-warn"><span class="dot dot-warn"></span> In Progress</span></div>
+            <div class="data-row"><span class="data-key">Status</span><span class="badge b-warn" id="tr-status"><span class="dot dot-warn"></span> In Progress</span></div>
           </div>
           <div class="card card-pad">
             <div class="card-title">Document Status</div>
@@ -781,7 +781,7 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
           <span class="success-icon">🎉</span>
           <h2 class="success-title">Application Submitted</h2>
           <p class="success-sub">Your details have been received. Tilly and her team will review your application<br>and contact you within <strong>24–48 hours</strong> via WhatsApp and email.</p>
-          <div class="ref-box"><div class="ref-label">Your Reference Number</div><div class="ref-code" id="reg-ref">NPS-2025-0847</div></div>
+          <div class="ref-box"><div class="ref-label">Your Reference Number</div><div class="ref-code" id="reg-ref">—</div></div>
           <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
             <button class="btn btn-primary" onclick="goSection('pt-track',document.querySelectorAll('.sb-item')[1])">Track My Progress →</button>
             <button class="btn btn-ghost" onclick="goSection('pt-pay',document.querySelectorAll('.sb-item')[6])">Make a Payment</button>
@@ -1015,7 +1015,7 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
         <table>
           <thead><tr><th>Client</th><th>Reference</th><th>Package</th><th>Stage</th><th>Role</th><th>Action</th></tr></thead>
           <tbody id="clients-tbody">
-            <tr><td><div style="font-weight:600">Abena Mensah</div><div style="font-size:.72rem;color:var(--muted)">abena@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0847</code></td><td>Full Package</td><td><select class="stage-sel" onchange="updStage(this,'0847')"><option>Registration</option><option>Documents</option><option selected>Credential Eval</option><option>Board Application</option><option>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-warn">GHS 890 due</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
+            <tr id="admin-loading-row"><td colspan="6" style="text-align:center;color:var(--muted);font-size:.82rem;padding:1.5rem">Loading clients from database...</td></tr>
             <tr><td><div style="font-weight:600">Kofi Asante</div><div style="font-size:.72rem;color:var(--muted)">kofi@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0851</code></td><td>Coaching Only</td><td><select class="stage-sel" onchange="updStage(this,'0851')"><option selected>Registration</option><option>Documents</option><option>Credential Eval</option><option>Board Application</option><option>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-danger">Unpaid</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
             <tr><td><div style="font-weight:600">Efua Darko</div><div style="font-size:.72rem;color:var(--muted)">efua@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0839</code></td><td>Retakers</td><td><select class="stage-sel" onchange="updStage(this,'0839')"><option>Registration</option><option>Documents</option><option>Credential Eval</option><option selected>Board Application</option><option>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-success">Paid ✓</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
             <tr><td><div style="font-weight:600">Yaw Boateng</div><div style="font-size:.72rem;color:var(--muted)">yaw@email.com</div></td><td><code style="font-size:.75rem;background:var(--pale);padding:.15rem .4rem;border-radius:4px">NPS-2025-0821</code></td><td>Full Package</td><td><select class="stage-sel" onchange="updStage(this,'0821')"><option>Registration</option><option>Documents</option><option>Credential Eval</option><option>Board Application</option><option selected>NCLEX Coaching</option><option>Passed ✓</option></select></td><td><span class="badge b-success">Paid ✓</span></td><td><button class="btn btn-sm btn-ghost">View</button></td></tr>
@@ -1186,24 +1186,67 @@ async function loadClientProfile(email){
   const { data } = await db.from('clients').select('*').eq('email', email).single();
   if(!data) return;
   clientProfile = data;
-  const fullName = data.first_name + ' ' + data.last_name;
-  const initials = (data.first_name[0] + data.last_name[0]).toUpperCase();
-  document.getElementById('sb-name').textContent   = fullName;
-  document.getElementById('sb-ref').textContent    = data.application_ref || '—';
-  document.getElementById('sb-av').textContent     = initials;
-  document.getElementById('dash-name').textContent = data.first_name;
-  document.getElementById('dash-ref').textContent  = data.application_ref || '—';
 
-  // Update stage badge
+  const firstName = data.first_name || '';
+  const lastName  = data.last_name  || '';
+  const fullName  = (firstName + ' ' + lastName).trim() || email;
+  const initials  = firstName && lastName
+    ? (firstName[0] + lastName[0]).toUpperCase()
+    : email[0].toUpperCase();
+
+  const ref  = data.application_ref || '—';
+  const pkg  = data.package         || '—';
+  const stage= data.stage           || 1;
   const stageNames = ['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
-  const stageEl = document.querySelector('.sb-badge.gold');
-  if(stageEl) stageEl.textContent = data.stage+'/6';
+  const stageName  = stageNames[stage] || 'Registration';
 
-  // Update dashboard stat card stage
-  const stageValEl = document.querySelector('.stat-card .stat-val');
-  if(stageValEl) stageValEl.textContent = data.stage + ' / 6';
-  const stageSubEl = document.querySelector('.stat-card .stat-sub.warn');
-  if(stageSubEl) stageSubEl.textContent = stageNames[data.stage] || '';
+  // ── Sidebar ──
+  document.getElementById('sb-av').textContent   = initials;
+  document.getElementById('sb-name').textContent = fullName;
+  document.getElementById('sb-ref').textContent  = ref;
+  const stageBadge = document.querySelector('.sb-badge.gold');
+  if(stageBadge) stageBadge.textContent = stage+'/6';
+
+  // ── Topbar ──
+  document.getElementById('tp-sub').textContent = 'Welcome back, '+firstName;
+
+  // ── Dashboard welcome bar ──
+  document.getElementById('dash-name').textContent = firstName || 'there';
+  document.getElementById('dash-ref').textContent  = ref;
+  const pkgEl = document.getElementById('dash-pkg');
+  if(pkgEl) pkgEl.textContent = pkg;
+
+  // ── Dashboard stage stat card ──
+  const stageValEl = document.querySelector('#pt-dash .stat-card .stat-val');
+  if(stageValEl) stageValEl.textContent = stage + ' / 6';
+  const stageSubEl = document.querySelector('#pt-dash .stat-card .stat-sub');
+  if(stageSubEl) stageSubEl.textContent = '⏳ '+stageName;
+
+  // ── Tracker section ──
+  const setEl = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
+  setEl('tr-ref',     ref);
+  setEl('tr-pkg',     pkg);
+  setEl('tr-country', data.target_country || '—');
+  setEl('tr-qual',    data.qualification  || '—');
+
+  // ── Update pipeline tracker visual ──
+  updatePipelineForStage(stage);
+}
+
+function updatePipelineForStage(stage){
+  // Update both pipeline trackers on dashboard and tracker page
+  document.querySelectorAll('.pipeline-track').forEach(track => {
+    const steps = track.querySelectorAll('.pip-step');
+    steps.forEach((s, i) => {
+      s.classList.remove('done','active','pending');
+      if(i < stage - 1)      s.classList.add('done');
+      else if(i === stage - 1) s.classList.add('active');
+      else                    s.classList.add('pending');
+    });
+    // Update progress bar CSS variable
+    const pct = Math.round(((stage-1) / 5) * 100);
+    track.style.setProperty('--prog', pct+'%');
+  });
 }
 
 // ══════════════════════════════════════════════
