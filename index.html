@@ -636,27 +636,27 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
         <div class="g4" style="margin-bottom:1.5rem">
           <div class="stat-card">
             <div class="stat-icon teal">◎</div>
-            <div class="stat-val">3 / 6</div>
+            <div class="stat-val" id="stat-stage">1 / 6</div>
             <div class="stat-label">Current Stage</div>
-            <div class="stat-sub warn">⏳ Credential Evaluation</div>
+            <div class="stat-sub warn" id="stat-stage-sub">⏳ Registration</div>
           </div>
           <div class="stat-card gold">
             <div class="stat-icon gold">◈</div>
-            <div class="stat-val">GHS 890</div>
+            <div class="stat-val" id="stat-balance">GHS 0</div>
             <div class="stat-label">Balance Outstanding</div>
-            <div class="stat-sub warn">Due 14 Jun 2025</div>
+            <div class="stat-sub warn" id="stat-balance-sub">No payments yet</div>
           </div>
           <div class="stat-card navy">
             <div class="stat-icon navy">◫</div>
-            <div class="stat-val">4 / 5</div>
+            <div class="stat-val" id="stat-docs">0 / 5</div>
             <div class="stat-label">Documents Submitted</div>
-            <div class="stat-sub warn">⚠ Birth cert pending</div>
+            <div class="stat-sub warn" id="stat-docs-sub">⚠ None uploaded yet</div>
           </div>
           <div class="stat-card success">
             <div class="stat-icon success">◉</div>
-            <div class="stat-val">47</div>
+            <div class="stat-val" id="stat-questions">0</div>
             <div class="stat-label">Questions Practised</div>
-            <div class="stat-sub up">↑ 8 this week</div>
+            <div class="stat-sub up" id="stat-questions-sub">Get started below</div>
           </div>
         </div>
 
@@ -681,11 +681,8 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
 
           <div class="card card-pad">
             <div class="card-title">Recent Activity</div>
-            <div class="tl">
-              <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Credential evaluation submitted</div><div class="tl-date">15 May 2025</div><div class="tl-note">Trumerit Ref: TRM-84729</div></div></div>
-              <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">All 4 documents verified ✓</div><div class="tl-date">10 May 2025</div></div></div>
-              <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Welcome call completed</div><div class="tl-date">5 May 2025</div></div></div>
-              <div class="tl-item"><div class="tl-line"><div class="tl-dot2 warn"></div></div><div class="tl-content"><div class="tl-title" style="color:var(--warn)">Birth certificate — still needed</div><div class="tl-date" style="color:var(--warn)">Action required</div></div></div>
+            <div class="tl" id="dash-activity">
+              <div class="tl-item"><div class="tl-content"><div class="tl-title" style="color:var(--muted)">Loading activity...</div></div></div>
             </div>
           </div>
         </div>
@@ -700,7 +697,7 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
           <div class="card card-pad" style="cursor:pointer;transition:all .2s" onclick="goSection('pt-pay',document.querySelectorAll('.sb-item')[6])" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--pale2)'">
             <div style="font-size:1.4rem;margin-bottom:.6rem">💳</div>
             <div style="font-weight:600;font-size:.875rem;color:var(--ink);margin-bottom:.2rem">Make Payment</div>
-            <div style="font-size:.75rem;color:var(--warn)">GHS 890 outstanding</div>
+            <div style="font-size:.75rem;color:var(--muted)" id="stat-balance-action">View payment options</div>
           </div>
           <div class="card card-pad" style="cursor:pointer;transition:all .2s" onclick="goSection('pt-qbank',document.querySelectorAll('.sb-item')[8])" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--pale2)'">
             <div style="font-size:1.4rem;margin-bottom:.6rem">📚</div>
@@ -724,11 +721,11 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
           </div>
           <div class="card card-pad">
             <div class="card-title">Document Status</div>
-            <div class="data-row"><span class="data-key">Passport</span><span class="badge b-success">✓ Verified</span></div>
-            <div class="data-row"><span class="data-key">NMC Licence</span><span class="badge b-success">✓ Verified</span></div>
-            <div class="data-row"><span class="data-key">Transcripts</span><span class="badge b-success">✓ Verified</span></div>
-            <div class="data-row"><span class="data-key">Certificate</span><span class="badge b-teal">Under Review</span></div>
-            <div class="data-row"><span class="data-key">Birth Certificate</span><span class="badge b-warn">⚠ Needed</span></div>
+            <div class="data-row"><span class="data-key">Passport</span><span class="badge b-warn" id="trdoc-passport">⚠ Not uploaded</span></div>
+            <div class="data-row"><span class="data-key">NMC Licence</span><span class="badge b-warn" id="trdoc-nmc">⚠ Not uploaded</span></div>
+            <div class="data-row"><span class="data-key">Nursing Certificate</span><span class="badge b-warn" id="trdoc-cert">⚠ Not uploaded</span></div>
+            <div class="data-row"><span class="data-key">Official Transcripts</span><span class="badge b-warn" id="trdoc-transcripts">⚠ Not uploaded</span></div>
+            <div class="data-row"><span class="data-key">Birth Certificate</span><span class="badge b-warn" id="trdoc-birth">⚠ Not uploaded</span></div>
           </div>
         </div>
 
@@ -751,12 +748,8 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
 
         <div class="card card-pad">
           <div class="card-title">Activity Log</div>
-          <div class="tl">
-            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Credential evaluation submitted to Trumerit</div><div class="tl-date">15 May 2025</div><div class="tl-note">Reference: TRM-84729. Monitoring in progress.</div></div></div>
-            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">All documents verified — Passport, NMC, Transcripts, Certificate</div><div class="tl-date">10 May 2025</div></div></div>
-            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Strategy call completed — Texas board selected</div><div class="tl-date">5 May 2025</div></div></div>
-            <div class="tl-item"><div class="tl-line"><div class="tl-dot2"></div></div><div class="tl-content"><div class="tl-title">Registration received and confirmed</div><div class="tl-date">2 May 2025</div></div></div>
-            <div class="tl-item"><div class="tl-line"><div class="tl-dot2 warn"></div></div><div class="tl-content"><div class="tl-title" style="color:var(--warn)">Birth certificate still required</div><div class="tl-date" style="color:var(--warn)">Please upload as soon as possible</div></div></div>
+          <div class="tl" id="track-activity">
+            <div class="tl-item"><div class="tl-content"><div class="tl-title" style="color:var(--muted)">Loading activity...</div></div></div>
           </div>
         </div>
       </div>
@@ -813,12 +806,12 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
               <div class="sec-label">Document Uploads</div>
               <div class="alert alert-info" style="margin-bottom:1.1rem">🔒 Files are encrypted and stored securely. Accepted formats: PDF, JPG, PNG — max 5MB each.</div>
               <div class="fg-row">
-                <div class="fg"><label>Passport Biodata Page <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">🛂</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
-                <div class="fg"><label>NMC Licence <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📋</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
-                <div class="fg"><label>Nursing Certificate <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">🎓</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
-                <div class="fg"><label>Official Transcripts <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📄</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
-                <div class="fg"><label>Birth Certificate</label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📜</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
-                <div class="fg"><label>Other Supporting Document</label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📁</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div></div>
+                <div class="fg"><label>Passport Biodata Page <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">🛂</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this,'passport')"/></div></div>
+                <div class="fg"><label>NMC Licence <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📋</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this,'nmc_licence')"/></div></div>
+                <div class="fg"><label>Nursing Certificate <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">🎓</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this,'certificate')"/></div></div>
+                <div class="fg"><label>Official Transcripts <span class="req">*</span></label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📄</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this,'transcripts')"/></div></div>
+                <div class="fg"><label>Birth Certificate</label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📜</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this,'birth_cert')"/></div></div>
+                <div class="fg"><label>Other Supporting Document</label><div class="file-drop" onclick="this.querySelector('input').click()"><div class="file-drop-icon">📁</div><strong>Click to upload</strong><p>PDF, JPG or PNG</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this,'other')"/></div></div>
               </div>
               <div style="display:flex;align-items:flex-start;gap:.6rem;margin:1rem 0"><input type="checkbox" id="consent" style="width:15px;height:15px;accent-color:var(--teal);flex-shrink:0;margin-top:2px"/><label for="consent" style="font-size:.78rem;color:var(--muted);cursor:pointer">I confirm all information is accurate and I consent to NCLEX Pro Solutions processing my data for the purpose of my application.</label></div>
               <div style="display:flex;justify-content:space-between;align-items:center"><button class="btn btn-ghost" onclick="rBack(4)">← Back</button><button class="btn btn-primary btn-lg" onclick="submitReg()">Submit Application ✓</button></div>
@@ -843,24 +836,21 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
         <div class="g2" style="margin-bottom:1.25rem">
           <div class="card card-pad">
             <div class="card-title">Upload a Document</div>
-            <div class="fg"><label>Document type</label><select style="width:100%;padding:.68rem .9rem;border:1.5px solid var(--pale2);border-radius:var(--r);font-size:.85rem;font-family:'Inter',sans-serif;outline:none"><option>Birth Certificate</option><option>Passport</option><option>NMC Licence</option><option>Other</option></select></div>
-            <div class="file-drop" onclick="this.querySelector('input').click()" style="margin-top:.5rem"><div class="file-drop-icon">📤</div><strong>Click to upload</strong><p>PDF, JPG, PNG · Max 5MB</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this)"/></div>
+            <div class="fg"><label>Document type</label><select id="doc-type-select" style="width:100%;padding:.68rem .9rem;border:1.5px solid var(--pale2);border-radius:var(--r);font-size:.85rem;font-family:'Inter',sans-serif;outline:none"><option value="passport">Passport</option><option value="nmc_licence">NMC Licence</option><option value="certificate">Nursing Certificate</option><option value="transcripts">Official Transcripts</option><option value="birth_cert">Birth Certificate</option><option value="other">Other</option></select></div>
+            <div class="file-drop" onclick="this.querySelector('input').click()" style="margin-top:.5rem"><div class="file-drop-icon">📤</div><strong>Click to upload</strong><p>PDF, JPG, PNG · Max 5MB</p><input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="onFileUp(this, document.getElementById('doc-type-select').value)"/></div>
           </div>
           <div class="card card-pad">
             <div class="card-title">Document Checklist</div>
-            <div class="data-row"><span class="data-key">Passport</span><span class="badge b-success">✓ Verified</span></div>
-            <div class="data-row"><span class="data-key">NMC Licence</span><span class="badge b-success">✓ Verified</span></div>
-            <div class="data-row"><span class="data-key">Nursing Certificate</span><span class="badge b-success">✓ Verified</span></div>
-            <div class="data-row"><span class="data-key">Official Transcripts</span><span class="badge b-teal">Under Review</span></div>
-            <div class="data-row"><span class="data-key">Birth Certificate</span><span class="badge b-warn">⚠ Required</span></div>
+            <div class="data-row"><span class="data-key">Passport</span><span class="badge b-warn" id="chk-passport">⚠ Required</span></div>
+            <div class="data-row"><span class="data-key">NMC Licence</span><span class="badge b-warn" id="chk-nmc">⚠ Required</span></div>
+            <div class="data-row"><span class="data-key">Nursing Certificate</span><span class="badge b-warn" id="chk-cert">⚠ Required</span></div>
+            <div class="data-row"><span class="data-key">Official Transcripts</span><span class="badge b-warn" id="chk-transcripts">⚠ Required</span></div>
+            <div class="data-row"><span class="data-key">Birth Certificate</span><span class="badge b-warn" id="chk-birth">⚠ Required</span></div>
           </div>
         </div>
         <div class="card card-pad">
           <div class="card-title">Uploaded Documents</div><div id="doc-uploaded-list">
-          <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">📄</div><div><div class="doc-name">Passport_Biodata.pdf</div><div class="doc-meta">1.2 MB · Uploaded 8 May 2025</div></div></div><span class="badge b-success">✓ Verified</span></div>
-          <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">📋</div><div><div class="doc-name">NMC_Licence_2024.pdf</div><div class="doc-meta">0.8 MB · Uploaded 8 May 2025</div></div></div><span class="badge b-success">✓ Verified</span></div>
-          <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">🎓</div><div><div class="doc-name">BSc_Nursing_Certificate.pdf</div><div class="doc-meta">2.1 MB · Uploaded 9 May 2025</div></div></div><span class="badge b-success">✓ Verified</span></div>
-          <div class="doc-item"><div style="display:flex;align-items:center;gap:.75rem"><div class="doc-icon">📄</div><div><div class="doc-name">Official_Transcripts.pdf</div><div class="doc-meta">3.4 MB · Uploaded 9 May 2025</div></div></div><span class="badge b-teal">Under Review</span></div>
+          <div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:.85rem">No documents uploaded yet — use the upload box above to add your first document.</div>
         </div>
       </div>
       </div><!-- close pt-docs portal-section -->
@@ -917,6 +907,13 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
           <div class="ref-box"><div class="ref-label">Booking Reference</div><div class="ref-code">BK-2025-0421</div></div>
           <button class="btn btn-primary" onclick="document.getElementById('book-main').style.display='block';document.getElementById('book-success').style.display='none'">Book Another Session</button>
         </div>
+
+        <div class="card card-pad" style="margin-top:1.25rem">
+          <div class="card-title">Your Bookings</div>
+          <div id="booking-history">
+            <div style="text-align:center;padding:1rem;color:var(--muted);font-size:.85rem">Loading...</div>
+          </div>
+        </div>
       </div>
 
       <!-- ── PAYMENTS ── -->
@@ -925,20 +922,18 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
           <div class="g2">
             <div>
               <div class="card card-pad" style="margin-bottom:1.1rem">
-                <div class="card-title">Outstanding Balance</div>
-                <div style="background:var(--warn-bg);border:1px solid rgba(217,119,6,.2);border-radius:var(--r);padding:1rem;margin-bottom:1rem">
-                  <div style="font-size:.72rem;color:var(--warn);font-weight:600;margin-bottom:.2rem">Amount Due</div>
-                  <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--ink)">GHS 890</div>
-                  <div style="font-size:.72rem;color:var(--muted)">Full Package Balance · Invoice INV-2025-001</div>
+                <div class="card-title">Payment Summary</div>
+                <div style="background:var(--off);border:1px solid var(--pale2);border-radius:var(--r);padding:1rem;margin-bottom:1rem">
+                  <div style="font-size:.72rem;color:var(--muted);font-weight:600;margin-bottom:.2rem">Total Paid To Date</div>
+                  <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--ink)" id="pay-total-paid">GHS 0</div>
+                  <div style="font-size:.72rem;color:var(--muted)" id="pay-count-sub">No payments yet</div>
                 </div>
-                <div class="data-row"><span class="data-key">Package total</span><span class="data-val">GHS 2,500</span></div>
-                <div class="data-row"><span class="data-key">Paid to date</span><span class="data-val" style="color:var(--success)">GHS 1,610</span></div>
-                <div class="data-row"><span class="data-key">Remaining</span><span class="data-val" style="color:var(--warn)">GHS 890</span></div>
+                <p style="font-size:.78rem;color:var(--muted);line-height:1.6">Select a payment item below to make a new payment. Contact support if you have questions about your package balance.</p>
               </div>
               <div class="card card-pad">
                 <div class="card-title">Select Payment</div>
                 <div class="plan-list" id="plan-list">
-                  <div class="plan-item sel" onclick="selPlan(this,'Full Package Balance',890)"><div class="plan-chk">✓</div><div class="plan-name">Full Package Balance <span class="plan-badge">Due</span></div><div class="plan-price">GHS 890</div><div class="plan-desc">Clear your remaining balance.</div></div>
+                  <div class="plan-item sel" onclick="selPlan(this,'Full Package',2500)"><div class="plan-chk">✓</div><div class="plan-name">Full Package</div><div class="plan-price">GHS 2,500</div><div class="plan-desc">Registration, coaching, and full support — see Settings → Application for your package details.</div></div>
                   <div class="plan-item" onclick="selPlan(this,'Single Coaching Session',250)"><div class="plan-chk"></div><div class="plan-name">Single Coaching Session</div><div class="plan-price">GHS 250</div><div class="plan-desc">One 60-minute coaching session.</div></div>
                   <div class="plan-item" onclick="selPlan(this,'Application Review',150)"><div class="plan-chk"></div><div class="plan-name">Application Review Session</div><div class="plan-price">GHS 150</div><div class="plan-desc">45-minute document or status review.</div></div>
                 </div>
@@ -970,9 +965,9 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
                 <input class="dark-input" type="text" placeholder="Your full name (for reference)"/>
               </div>
               <div class="sep" style="border-color:rgba(255,255,255,.08)"></div>
-              <div class="ps-row"><span class="ps-key">Item</span><span class="ps-val" id="pay-item">Full Package Balance</span></div>
+              <div class="ps-row"><span class="ps-key">Item</span><span class="ps-val" id="pay-item">Full Package</span></div>
               <div class="ps-row"><span class="ps-key">Processing fee</span><span class="ps-val">GHS 0</span></div>
-              <div class="ps-row"><span class="ps-key">Total</span><span class="ps-val ps-total" id="pay-total">GHS 890</span></div>
+              <div class="ps-row"><span class="ps-key">Total</span><span class="ps-val ps-total" id="pay-total">GHS 2,500</span></div>
               <div style="height:.75rem"></div>
               <button class="btn btn-primary btn-block" style="border-radius:var(--r)" onclick="confirmPay()">Pay Now 🔒</button>
               <div class="secure-note">256-bit SSL · Secured by Paystack</div>
@@ -985,6 +980,13 @@ tbody tr:hover td{background:rgba(0,168,150,.03)}
           <p class="success-sub">Your payment has been received. Our team will reach out within <strong>2 hours</strong>.</p>
           <div class="ref-box"><div class="ref-label">Receipt Number</div><div class="ref-code" id="pay-receipt">PAY-2025-7731</div></div>
           <button class="btn btn-primary" onclick="goSection('pt-track',document.querySelectorAll('.sb-item')[1])">View My Progress →</button>
+        </div>
+
+        <div class="card card-pad" style="margin-top:1.25rem">
+          <div class="card-title">Payment History</div>
+          <div id="payment-history">
+            <div style="text-align:center;padding:1rem;color:var(--muted);font-size:.85rem">Loading...</div>
+          </div>
         </div>
       </div>
 
@@ -1780,6 +1782,7 @@ async function loadClientProfile(email){
   const stage= data.stage           || 1;
   const stageNames = ['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
   const stageName  = stageNames[stage] || 'Registration';
+  const setEl = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
 
   // ── Sidebar ──
   document.getElementById('sb-av').textContent   = initials;
@@ -1798,13 +1801,10 @@ async function loadClientProfile(email){
   if(pkgEl) pkgEl.textContent = pkg;
 
   // ── Dashboard stage stat card ──
-  const stageValEl = document.querySelector('#pt-dash .stat-card .stat-val');
-  if(stageValEl) stageValEl.textContent = stage + ' / 6';
-  const stageSubEl = document.querySelector('#pt-dash .stat-card .stat-sub');
-  if(stageSubEl) stageSubEl.textContent = '⏳ '+stageName;
+  setEl('stat-stage', stage + ' / 6');
+  setEl('stat-stage-sub', '⏳ ' + stageName);
 
   // ── Tracker section ──
-  const setEl = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
   setEl('tr-ref',     ref);
   setEl('tr-pkg',     pkg);
   setEl('tr-country', data.target_country || '—');
@@ -1812,6 +1812,77 @@ async function loadClientProfile(email){
 
   // ── Update pipeline tracker visual ──
   updatePipelineForStage(stage);
+
+  // ── Load everything else that depends on application_ref ──
+  if(ref !== '—'){
+    await loadDocuments();
+    await loadBookings();
+    await loadPaymentHistory();
+    await loadActivityFeed();
+  }
+}
+
+// Builds the Recent Activity (dashboard) and Activity Log (tracker) feeds
+// from real bookings, payments, and documents — no hardcoded demo entries.
+async function loadActivityFeed(){
+  if(!clientProfile || !clientProfile.application_ref) return;
+  const ref = clientProfile.application_ref;
+
+  const [{ data: docs }, { data: bookings }, { data: payments }] = await Promise.all([
+    db.from('documents').select('*').eq('client_ref', ref),
+    db.from('bookings').select('*').eq('client_ref', ref),
+    db.from('payments').select('*').eq('client_ref', ref),
+  ]);
+
+  const events = [];
+
+  events.push({
+    date: clientProfile.created_at,
+    title: 'Registration received and confirmed',
+    note: 'Reference: ' + ref,
+  });
+
+  (docs || []).forEach(d => events.push({
+    date: d.created_at,
+    title: (d.doc_type || 'Document') + ' uploaded',
+    note: d.status === 'verified' ? 'Verified' : 'Awaiting review',
+  }));
+
+  (bookings || []).forEach(b => events.push({
+    date: b.created_at,
+    title: (b.session_type || 'Session') + ' booked',
+    note: b.status === 'confirmed' ? 'Confirmed — ' + b.date + ' ' + b.time : 'Pending confirmation',
+  }));
+
+  (payments || []).forEach(p => events.push({
+    date: p.created_at,
+    title: 'Payment of ' + (p.currency || 'GHS') + ' ' + p.amount + ' ' + (p.status === 'paid' ? 'received' : 'recorded'),
+    note: p.method || '',
+  }));
+
+  events.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const renderFeed = (containerId, limit) => {
+    const el = document.getElementById(containerId);
+    if(!el) return;
+    const shown = events.slice(0, limit || events.length);
+    if(!shown.length){
+      el.innerHTML = '<div class="tl-item"><div class="tl-content"><div class="tl-title" style="color:var(--muted)">No activity yet.</div></div></div>';
+      return;
+    }
+    el.innerHTML = shown.map(ev => `
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot2"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">${ev.title}</div>
+          <div class="tl-date">${ev.date ? new Date(ev.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''}</div>
+          ${ev.note ? `<div class="tl-note">${ev.note}</div>` : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  renderFeed('dash-activity', 4);
+  renderFeed('track-activity');
 }
 
 function updatePipelineForStage(stage){
@@ -1984,11 +2055,38 @@ async function confirmBook(){
   document.getElementById('book-main').style.display='none';
   document.getElementById('book-success').style.display='block';
   window.scrollTo({top:0,behavior:'smooth'});
+  await loadBookings();
+  await loadActivityFeed();
 }
 
 async function loadBookings(){
-  if(!clientProfile) return;
-  // Booking history could be loaded here and shown in a table
+  if(!clientProfile || !clientProfile.application_ref) return;
+  const el = document.getElementById('booking-history');
+  if(!el) return;
+
+  const { data, error } = await db.from('bookings')
+    .select('*')
+    .eq('client_ref', clientProfile.application_ref)
+    .order('created_at', { ascending: false });
+
+  if(error){ console.error('loadBookings error:', error.message); return; }
+
+  if(!data || !data.length){
+    el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:.85rem">No bookings yet — choose a session above to get started.</div>';
+    return;
+  }
+
+  el.innerHTML = data.map(b => `
+    <div class="data-row">
+      <div>
+        <div style="font-size:.83rem;font-weight:600;color:var(--ink)">${b.session_type || 'Session'}</div>
+        <div style="font-size:.72rem;color:var(--muted)">${b.date || ''} · ${b.time || ''}</div>
+      </div>
+      <span class="badge ${b.status==='confirmed'?'b-success':b.status==='cancelled'?'b-danger':'b-warn'}">
+        ${b.status==='confirmed'?'✓ Confirmed':b.status==='cancelled'?'Cancelled':'Pending'}
+      </span>
+    </div>`
+  ).join('');
 }
 
 // ══════════════════════════════════════════════
@@ -2048,12 +2146,55 @@ function confirmPay(){
       document.getElementById('pay-success').style.display='block';
       document.getElementById('pay-receipt').textContent = response.reference;
       window.scrollTo({top:0,behavior:'smooth'});
+      await loadPaymentHistory();
+      await loadActivityFeed();
     }
   });
   handler.openIframe();
 }
 
-async function loadPaymentHistory(){ /* Can load and display payment records here */ }
+async function loadPaymentHistory(){
+  if(!clientProfile || !clientProfile.application_ref) return;
+  const el = document.getElementById('payment-history');
+
+  const { data, error } = await db.from('payments')
+    .select('*')
+    .eq('client_ref', clientProfile.application_ref)
+    .order('created_at', { ascending: false });
+
+  if(error){ console.error('loadPaymentHistory error:', error.message); return; }
+
+  // ── Render the history list ──
+  if(el){
+    if(!data || !data.length){
+      el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--muted);font-size:.85rem">No payments yet.</div>';
+    } else {
+      el.innerHTML = data.map(p => `
+        <div class="data-row">
+          <div>
+            <div style="font-size:.83rem;font-weight:600;color:var(--ink)">${p.currency || 'GHS'} ${p.amount}</div>
+            <div style="font-size:.72rem;color:var(--muted)">${p.method || ''} · ${p.paystack_ref || ''} · ${p.created_at ? new Date(p.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''}</div>
+          </div>
+          <span class="badge ${p.status==='paid'?'b-success':p.status==='failed'?'b-danger':'b-warn'}">
+            ${p.status==='paid'?'✓ Paid':p.status==='failed'?'Failed':'Pending'}
+          </span>
+        </div>`
+      ).join('');
+    }
+  }
+
+  // ── Dashboard balance stat — total paid so far ──
+  const paidCount = (data || []).filter(p => p.status === 'paid').length;
+  const totalPaid = (data || []).filter(p => p.status === 'paid').reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  const setEl3 = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
+  setEl3('stat-balance', 'GHS ' + totalPaid.toLocaleString());
+  setEl3('stat-balance-sub', totalPaid > 0 ? 'Total paid to date' : 'No payments yet');
+  setEl3('stat-balance-action', totalPaid > 0 ? paidCount + ' payment' + (paidCount===1?'':'s') + ' made' : 'View payment options');
+
+  // ── Payments page summary card ──
+  setEl3('pay-total-paid', 'GHS ' + totalPaid.toLocaleString());
+  setEl3('pay-count-sub', paidCount > 0 ? paidCount + ' payment' + (paidCount===1?'':'s') + ' completed' : 'No payments yet');
+}
 
 // ══════════════════════════════════════════════
 // REGISTRATION FORM
@@ -2184,9 +2325,10 @@ async function submitReg(){
 // ══════════════════════════════════════════════
 // FILE UPLOAD — SUPABASE STORAGE
 // ══════════════════════════════════════════════
-async function onFileUp(inp){
+async function onFileUp(inp, docType){
   if(!inp.files[0]) return;
   const file = inp.files[0];
+  docType = docType || 'general';
 
   // Validate file type and size
   const allowed = ['application/pdf','image/jpeg','image/png'];
@@ -2206,10 +2348,10 @@ async function onFileUp(inp){
     return;
   }
 
-  // Save document record
+  // Save document record with the real type so the checklist can match it
   await db.from('documents').insert([{
     client_ref: ref,
-    doc_type:   'general',
+    doc_type:   docType,
     file_url:   path,
     status:     'submitted'
   }]);
@@ -2226,30 +2368,69 @@ async function onFileUp(inp){
 
 async function loadDocuments(){
   if(!clientProfile) return;
+  const list = document.getElementById('doc-uploaded-list');
+
   const { data, error } = await db.from('documents')
     .select('*')
     .eq('client_ref', clientProfile.application_ref)
     .order('created_at', { ascending: false });
 
-  if(error||!data||!data.length) return;
+  if(error){
+    console.error('loadDocuments error:', error.message);
+    return;
+  }
 
-  const list = document.getElementById('doc-uploaded-list');
-  if(!list) return;
+  // ── Uploaded documents list (handles empty case correctly) ──
+  if(list){
+    if(!data || !data.length){
+      list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:.85rem">No documents uploaded yet — use the upload box above to add your first document.</div>';
+    } else {
+      list.innerHTML = data.map(doc => `
+        <div class="doc-item">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <div class="doc-icon">📄</div>
+            <div>
+              <div class="doc-name">${doc.file_url.split('/').pop()}</div>
+              <div class="doc-meta">${doc.doc_type} · ${new Date(doc.created_at).toLocaleDateString()}</div>
+            </div>
+          </div>
+          <span class="badge ${doc.status==='verified'?'b-success':doc.status==='submitted'?'b-teal':'b-warn'}">
+            ${doc.status==='verified'?'✓ Verified':doc.status==='submitted'?'Submitted':'Pending'}
+          </span>
+        </div>`
+      ).join('');
+    }
+  }
 
-  list.innerHTML = data.map(doc => `
-    <div class="doc-item">
-      <div style="display:flex;align-items:center;gap:.75rem">
-        <div class="doc-icon">📄</div>
-        <div>
-          <div class="doc-name">${doc.file_url.split('/').pop()}</div>
-          <div class="doc-meta">${doc.doc_type} · ${new Date(doc.created_at).toLocaleDateString()}</div>
-        </div>
-      </div>
-      <span class="badge ${doc.status==='verified'?'b-success':doc.status==='submitted'?'b-teal':'b-warn'}">
-        ${doc.status==='verified'?'✓ Verified':doc.status==='submitted'?'Submitted':'Pending'}
-      </span>
-    </div>`
-  ).join('');
+  // ── Checklist badges (Documents page) + Tracker badges (My Journey page) ──
+  const docTypeMap = {
+    passport:     ['chk-passport', 'trdoc-passport'],
+    nmc_licence:  ['chk-nmc', 'trdoc-nmc'],
+    certificate:  ['chk-cert', 'trdoc-cert'],
+    transcripts:  ['chk-transcripts', 'trdoc-transcripts'],
+    birth_cert:   ['chk-birth', 'trdoc-birth'],
+  };
+
+  const setBadge = (id, status) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(status === 'verified'){ el.className = 'badge b-success'; el.textContent = '✓ Verified'; }
+    else if(status === 'submitted'){ el.className = 'badge b-teal'; el.textContent = 'Under Review'; }
+    else { el.className = 'badge b-warn'; el.textContent = '⚠ Required'; }
+  };
+
+  Object.entries(docTypeMap).forEach(([type, ids]) => {
+    const match = (data || []).find(d => d.doc_type === type);
+    ids.forEach(id => setBadge(id, match ? match.status : null));
+  });
+
+  // ── Dashboard documents-submitted stat ──
+  const uploadedCount = (data || []).length;
+  const setEl2 = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
+  setEl2('stat-docs', uploadedCount + ' / 5');
+  setEl2('stat-docs-sub', uploadedCount === 0
+    ? '⚠ None uploaded yet'
+    : uploadedCount >= 5 ? '✓ All submitted' : '⚠ ' + (5 - uploadedCount) + ' remaining');
 }
 
 // ══════════════════════════════════════════════
@@ -2306,8 +2487,8 @@ async function loadAdminDash(){
 
     // Populate today's sessions panel
     const sessEl = document.querySelector('#at-dash .tl:last-child');
-    if(sessEl && bookings && bookings.length > 0) {
-      const upcoming = bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').slice(0, 3);
+    if(sessEl){
+      const upcoming = (bookings || []).filter(b => b.status === 'pending' || b.status === 'confirmed').slice(0, 3);
       if(upcoming.length > 0) {
         sessEl.innerHTML = upcoming.map(b => `
           <div class="tl-item">
