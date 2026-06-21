@@ -1498,16 +1498,23 @@ async function doLogin(){
   if(loginBtn){ loginBtn.textContent = 'Sign In →'; loginBtn.disabled = false; }
 
   if(error){
+    console.error('LOGIN FAILED — Supabase error:', error.message, error);
     let msg = 'Incorrect email or password. Please try again.';
     if(error.message.includes('Email not confirmed'))
       msg = 'Please confirm your email address first. Check your inbox for a confirmation link.';
+    if(error.message.includes('Invalid login credentials'))
+      msg = 'Incorrect email or password. (Check console for details if this persists.)';
     errEl.textContent = msg;
     errEl.style.display = 'block';
     showToast('');
   } else {
+    console.log('LOGIN SUCCESS — Supabase user:', data.user.email);
     errEl.style.display = 'none';
     currentUser = data.user;
     await loadClientProfile(email);
+    if(!clientProfile){
+      console.error('LOGIN OK but loadClientProfile returned nothing — check clients table RLS / row exists for', email);
+    }
     showScreen('s-portal');
     goSection('pt-dash', document.querySelector('.sb-item'));
   }
@@ -1519,20 +1526,33 @@ async function doLogin(){
 // ══════════════════════════════════════════════
 // RESEND CONFIG — paste your Resend API key here
 // ══════════════════════════════════════════════
-const RESEND_KEY = 're_J6F8xrqh_N8QkfbFfnJNGAxpVyZ2YQBdR';
+const RESEND_KEY = 'YOUR_RESEND_API_KEY'; // get free at resend.com — starts with re_
 
 async function sendWelcomeEmail(to, firstName, ref, tempPwd) {
-  // NOTE: Direct browser-to-Resend calls are blocked by CORS.
-  // Store credentials in Supabase so admin can view them,
-  // and show them on screen. Email delivery requires a server/edge function.
+  // Store the temp password in Supabase for admin reference (non-critical if it fails)
   try {
-    // Store the temp password in Supabase for admin reference
     await db.from('clients')
       .update({ temp_password: tempPwd })
       .eq('email', to);
-  } catch(e) { /* non-critical */ }
-  // Always return true so registration flow continues
-  return true;
+  } catch(e) { console.warn('Could not store temp_password column:', e.message); }
+
+  // Send the real email via a Supabase Edge Function (bypasses browser CORS block on Resend)
+  try {
+    const portalUrl = window.location.origin + window.location.pathname;
+    const { data, error } = await db.functions.invoke('send-welcome-email', {
+      body: { to, firstName, ref, tempPwd, portalUrl }
+    });
+
+    if (error) {
+      console.error('send-welcome-email function error:', error);
+      return false;
+    }
+    console.log('Welcome email sent:', data);
+    return true;
+  } catch(e) {
+    console.error('sendWelcomeEmail failed:', e.message);
+    return false;
+  }
 }
 
 async function doRegister(){
@@ -1558,11 +1578,19 @@ async function doRegister(){
   btn.disabled = true;
 
   // 1. Create Supabase auth account
+  // All profile fields are passed as metadata — the handle_new_user trigger
+  // reads this to build the clients row automatically and reliably.
   const { data: authData, error: authError } = await db.auth.signUp({
     email,
     password: tempPwd,
     options: {
-      data: { first_name: firstName, last_name: lastName, role: 'client' },
+      data: {
+        first_name:      firstName,
+        last_name:       lastName,
+        whatsapp:        whatsapp,
+        application_ref: ref,
+        role:            'client',
+      },
       // emailRedirectTo only needed if Confirm Email is ON in Supabase
       emailRedirectTo: window.location.origin + window.location.pathname,
     }
@@ -1578,45 +1606,11 @@ async function doRegister(){
     return;
   }
 
-  // 2. Save client profile to Supabase clients table
-  // We retry with the authenticated session to ensure RLS passes
-  const { data: insertData, error: dbError } = await db.from('clients').insert([{
-    email,
-    first_name:      firstName,
-    last_name:       lastName,
-    whatsapp,
-    application_ref: ref,
-    stage:           1,
-    role:            'client'
-  }]).select();
-
-  if(dbError){
-    console.error('Profile save error:', dbError);
-
-    // ── RLS is blocking the INSERT ──
-    // Show a clear error so the client knows what happened
-    errEl.textContent = 'Account created in auth but profile could not be saved. Error: ' + dbError.message
-      + ' — Please contact support with your email address.';
-    errEl.style.display = 'block';
-
-    // Still show success screen so they have their temp password
-    // but flag the issue
-    document.getElementById('new-ref').textContent         = ref;
-    const newEmailEl = document.getElementById('new-email');
-    const newPwdEl   = document.getElementById('new-pwd');
-    if(newEmailEl) newEmailEl.textContent = email;
-    if(newPwdEl)   newPwdEl.textContent   = tempPwd;
-    document.getElementById('f-register').style.display    = 'none';
-    document.getElementById('f-reg-success').style.display = 'block';
-    document.getElementById('auth-title').textContent      = 'Account Created — Action Needed';
-    document.getElementById('auth-sub').textContent        = 'Please contact support — profile not saved';
-    btn.textContent = 'Create Account →';
-    btn.disabled    = false;
-    return;
-  }
-
-  // Profile saved successfully
-  console.log('Client profile saved:', insertData);
+  // 2. Client profile is created automatically by a Supabase database trigger
+  //    (handle_new_user) the moment the auth.users row is created — this works
+  //    correctly whether or not "Confirm email" is turned on, unlike inserting
+  //    from the browser, which fails silently if there's no session yet.
+  console.log('Auth user created — clients row will be created by database trigger:', authData.user?.id);
 
   // 3. Send welcome email with login details via Resend
   const emailSent = await sendWelcomeEmail(email, firstName, ref, tempPwd);
@@ -1653,6 +1647,9 @@ async function doAdminLogin(){
   }
 
   showToast('Signing in...');
+  errEl.style.display = 'none';
+
+  // Step 1 — authenticate
   const { data, error } = await db.auth.signInWithPassword({ email, password });
 
   if(error){
@@ -1662,44 +1659,86 @@ async function doAdminLogin(){
     return;
   }
 
-  // Try to get role from clients table
-  // Note: if RLS blocks this, try checking Supabase auth user metadata
-  let isAdmin = false;
+  // Step 2 — check role in clients table
+  // Three fallback approaches so RLS or missing rows do not block admin access
+  let isAdmin   = false;
+  let debugInfo = [];
+
   try {
-    const { data: profile, error: profileErr } = await db
+    // Attempt A: fetch role by email
+    const { data: profile, error: rErr } = await db
       .from('clients')
       .select('role')
       .eq('email', email)
-      .maybeSingle(); // maybeSingle does not throw on 0 rows
+      .maybeSingle();
 
-    if(profile && profile.role === 'admin') {
+    debugInfo.push('Attempt A — profile fetch: ' + (rErr ? rErr.message : profile ? JSON.stringify(profile) : 'null'));
+
+    if(profile && profile.role === 'admin'){
       isAdmin = true;
-    } else if(profileErr) {
-      console.warn('Profile fetch error (check RLS):', profileErr.message);
-      // Fallback: check user metadata set during signup
-      const meta = data.user?.user_metadata;
-      if(meta && meta.role === 'admin') isAdmin = true;
+      debugInfo.push('Granted via clients table role field');
     }
-  } catch(e) {
-    console.error('Admin check error:', e);
+
+    // Attempt B: if RLS blocked the query, check user_metadata
+    if(!isAdmin){
+      const meta = data.user?.user_metadata;
+      debugInfo.push('Attempt B — user_metadata: ' + JSON.stringify(meta));
+      if(meta && meta.role === 'admin'){
+        isAdmin = true;
+        debugInfo.push('Granted via user_metadata');
+      }
+    }
+
+    // Attempt C: if row exists but role is wrong, show specific message
+    if(!isAdmin && profile && profile.role !== 'admin'){
+      debugInfo.push('Row found but role = "' + profile.role + '" — needs to be "admin"');
+    }
+
+    // Attempt D: if no row at all
+    if(!isAdmin && !profile && !rErr){
+      debugInfo.push('No row found in clients table for this email');
+    }
+
+  } catch(e){
+    debugInfo.push('Exception: ' + e.message);
   }
 
+  console.log('Admin login debug:', debugInfo.join(' | '));
+
   if(!isAdmin){
-    errEl.textContent = 'Access denied — not an admin account. Check your role in Supabase.';
+    // Build a helpful error message based on what we found
+    const lastDebug = debugInfo.join(' ');
+    let msg = 'Access denied. ';
+
+    if(lastDebug.includes('needs to be "admin"')){
+      msg += 'Your row exists in Supabase but the role field is not set to admin. '
+           + 'Go to Supabase → Table Editor → clients → find your email → set role = admin (lowercase) → save.';
+    } else if(lastDebug.includes('No row found')){
+      msg += 'No profile row found for this email in the clients table. '
+           + 'Go to Supabase → Table Editor → clients → Insert row → add your email with role = admin.';
+    } else if(lastDebug.includes('RLS') || lastDebug.includes('policy')){
+      msg += 'The clients table RLS policy is blocking the role check. '
+           + 'Go to Supabase → Authentication → Policies → clients → add a SELECT policy with USING: true for the authenticated role temporarily.';
+    } else {
+      msg += 'Check Supabase → Table Editor → clients → your email row → role field must be exactly: admin (all lowercase, no spaces).';
+    }
+
+    errEl.textContent = msg;
     errEl.style.display = 'block';
     await db.auth.signOut();
     return;
   }
 
+  // ── Access granted — show admin dashboard ──
   errEl.style.display = 'none';
   showScreen('s-admin');
   ['at-clients','at-book','at-pay'].forEach(s=>{
-    const e=document.getElementById(s);
-    if(e) e.style.display='none';
+    const e = document.getElementById(s);
+    if(e) e.style.display = 'none';
   });
   const dashEl = document.getElementById('at-dash');
-  if(dashEl) dashEl.style.display='block';
-  document.querySelectorAll('.admin-item').forEach(i=>i.classList.remove('on'));
+  if(dashEl) dashEl.style.display = 'block';
+  document.querySelectorAll('.admin-item').forEach(i => i.classList.remove('on'));
   const firstItem = document.querySelector('.admin-item');
   if(firstItem) firstItem.classList.add('on');
   loadAdminDash();
@@ -2235,7 +2274,14 @@ async function loadAdminDash(){
   try {
     // Load client count
     const { data: clients, error } = await db.from('clients').select('*');
-    if(error){ console.error('Admin dash error:', error); }
+    if(error){
+      console.error('Admin dash error — likely RLS:', error.message);
+      const titleEl = document.querySelector('.admin-page-title');
+      if(titleEl) titleEl.textContent = 'Welcome back 👋';
+      const subEl = document.querySelector('.admin-page-sub');
+      if(subEl) subEl.textContent = '⚠ Could not load data — add admin RLS policy in Supabase';
+      // Still show the page, just with zeros
+    }
 
     const total    = clients ? clients.length : 0;
     const active   = clients ? clients.filter(c => c.stage < 6).length : 0;
@@ -2305,23 +2351,52 @@ async function loadAdminDash(){
 }
 
 async function loadAdminClients(){
-  const { data } = await db.from('clients').select('*').order('created_at', { ascending: false });
-  if(!data) return;
   const tbody = document.getElementById('clients-tbody');
   if(!tbody) return;
+
+  // Show loading state
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--muted)">Loading clients...</td></tr>';
+
+  const { data, error } = await db.from('clients')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if(error){
+    console.error('loadAdminClients error:', error);
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--danger)">
+      ⚠ Could not load clients — RLS policy missing.<br>
+      <span style="font-size:.72rem;color:var(--muted)">Go to Supabase → Policies → clients table → add admin SELECT policy</span>
+    </td></tr>`;
+    showToast('RLS blocking admin — see Supabase policies');
+    return;
+  }
+
+  if(!data || data.length === 0){
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--muted)">No clients registered yet.</td></tr>';
+    return;
+  }
+
   const stages = ['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
-  tbody.innerHTML = data.map(c => `
+  tbody.innerHTML = data.map(cl => `
     <tr>
-      <td><div style="font-weight:600">${c.first_name} ${c.last_name}</div><div style="font-size:.72rem;color:var(--muted)">${c.email}</div></td>
-      <td><code style="font-size:.72rem;background:var(--pale);padding:.12rem .35rem;border-radius:4px">${c.application_ref||'—'}</code></td>
-      <td>${c.package||'—'}</td>
       <td>
-        <select class="stage-sel" onchange="updStage(this,'${c.application_ref}')">
-          ${stages.map((s,i)=>i===0?'':`<option value="${i}" ${c.stage===i?'selected':''}>${s}</option>`).join('')}
+        <div style="font-weight:600">${cl.first_name||''} ${cl.last_name||''}</div>
+        <div style="font-size:.72rem;color:var(--muted)">${cl.email||''}</div>
+        <div style="font-size:.68rem;color:var(--faint)">${cl.whatsapp||''}</div>
+      </td>
+      <td><code style="font-size:.72rem;background:var(--pale);padding:.12rem .35rem;border-radius:4px">${cl.application_ref||'—'}</code></td>
+      <td style="font-size:.8rem">${cl.package||'—'}</td>
+      <td>
+        <select class="stage-sel" onchange="updStage(this,'${cl.application_ref||''}','${cl.email||''}')">
+          ${stages.map((s,i)=>i===0?'':`<option value="${i}" ${(cl.stage||1)===i?'selected':''}>${s}</option>`).join('')}
         </select>
       </td>
-      <td><span class="badge b-navy">${c.role||'client'}</span></td>
-      <td><button class="btn btn-sm btn-ghost">View</button></td>
+      <td>
+        <div style="font-size:.75rem;color:var(--muted)">${new Date(cl.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+      </td>
+      <td>
+        <a href="https://wa.me/${(cl.whatsapp||'').replace(/[^0-9]/g,'')}" target="_blank" class="btn btn-sm btn-ghost" style="padding:.35rem .7rem">💬</a>
+      </td>
     </tr>`
   ).join('');
 }
@@ -2368,12 +2443,25 @@ async function loadAdminPayments(){
   ).join('');
 }
 
-async function updStage(sel, ref){
-  const { error } = await db.from('clients').update({ stage: parseInt(sel.value) }).eq('application_ref', ref);
-  if(error){ showToast('Update failed'); console.error(error); }
-  else {
-    const labels=['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
-    showToast('✓ '+ref+' updated to: '+labels[sel.value]);
+async function updStage(sel, ref, email){
+  const stage = parseInt(sel.value);
+  const labels = ['','Registration','Documents','Credential Eval','Board Application','NCLEX Coaching','Passed ✓'];
+
+  let error;
+  if(ref && ref !== 'undefined' && ref !== '') {
+    const res = await db.from('clients').update({ stage }).eq('application_ref', ref);
+    error = res.error;
+  } else if(email) {
+    // Fallback: update by email if no ref
+    const res = await db.from('clients').update({ stage }).eq('email', email);
+    error = res.error;
+  }
+
+  if(error){
+    showToast('Stage update failed — check RLS policies');
+    console.error('updStage error:', error);
+  } else {
+    showToast('✓ Updated to: ' + labels[stage]);
   }
 }
 
